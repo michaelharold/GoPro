@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #fff7b0, #ffe29f);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+    }
+    .back-arrow {
+      position: absolute;
+      left: 16px;
+      top: 20px;
+      font-size: 24px;
+      text-decoration: none;
+      color: #707070;
+      transition: transform 0.2s ease;
+    }
+    .back-arrow:hover {
+      transform: translateX(-4px);
+    }
+    .avatar-container {
+      width: 132px;
+      height: 132px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      overflow: hidden;
+      animation: float 3s ease-in-out infinite;
+    }
+    .avatar-container img {
+      width: 144px;
+      height: 144px;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      margin: -3px auto 0;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 1.9rem;
+      color: #1a1a1a;
+    }
+    .login-box {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      width: 340px;
+      padding: 40px 24px;
+      border-radius: 25px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative;
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 91%;
+      padding: 14px;
+      margin: 8px 0 20px 0;
+      border-radius: 20px;
+      border: 1px solid #e0e0e0;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    input:focus {
+      border-color: #2962ff;
+      box-shadow: 0 0 6px rgba(41, 98, 255, 0.4);
+    }
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #2962ff, #0039cb);
+      color: white;
+      padding: 12px 0;
+      border: none;
+      border-radius: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(41, 98, 255, 0.4);
+    }
+    a.forgot {
+      display: block;
+      color: #2962ff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+    a.forgot:hover {
+      color: #0039cb;
+    }
+  </style>
+</head>
+<body>
+ <div class="login-box">
+  <a href="#" class="back-arrow">&#8592;</a>
+  <div class="avatar-container">
+    <img src="Images/Logo Files/Logo-removebg.png" alt="PRO Logo" />
+  </div>
+  <h1>Sign In</h1>
+  <form>
+    <div class="input-group">
+      <input type="email" placeholder="Email" required />
+    </div>
+    <div class="input-group">
+      <input type="password" placeholder="Password" required />
+    </div>
+    <button type="submit">Sign In</button>
+    <a href="#" class="forgot">Forgot Password?</a>
+  </form>
+</div>
+</body>
+</html>
