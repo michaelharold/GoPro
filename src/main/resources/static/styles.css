@@ -1,0 +1,60 @@
+
+    body {
+      background: linear-gradient(135deg, #fff7b0, #ffe29f);
+      font-family: 'Poppins', sans-serif;
+    }
+    .avatar-container {
+      width: 132px;
+      height: 132px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      overflow: hidden;
+      animation: float 3s ease-in-out infinite;
+    }
+    .avatar-container img {
+      width: 144px;
+      height: 144px;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      margin: -3px auto 0;
+    }
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.1;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🔹 Back arrow animation */
+    .back-arrow {
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: arrowFadeIn 0.8s ease forwards;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+    .back-arrow:hover {
+      transform: translateX(-5px);
+    }
+    @keyframes arrowFadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
