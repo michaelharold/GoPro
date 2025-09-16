@@ -6,57 +6,14 @@
   <title>Sign In</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-  <style>
-    body {
-      background: linear-gradient(135deg, #fff7b0, #ffe29f);
-      font-family: 'Poppins', sans-serif;
-    }
-    .avatar-container {
-      width: 132px;
-      height: 132px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      overflow: hidden;
-      animation: float 3s ease-in-out infinite;
-    }
-    .avatar-container img {
-      width: 144px;
-      height: 144px;
-      object-fit: cover;
-      border-radius: 50%;
-      display: block;
-      margin: -3px auto 0;
-    }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    .fade-in {
-      animation: fadeIn 0.6s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 🔹 Back arrow animation */
-    .back-arrow {
-      opacity: 0;
-      transform: translateX(-10px);
-      animation: arrowFadeIn 0.8s ease forwards;
-      display: inline-block;
-      transition: transform 0.3s ease;
-    }
-    .back-arrow:hover {
-      transform: translateX(-5px);
-    }
-    @keyframes arrowFadeIn {
-      from { opacity: 0; transform: translateX(-10px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  
 </head>
+ <div class="background">
+         <img src="Images/Logo Files/Logo-removebg.png" alt="GOPro Logo" class="logo">
+    </div>
 <body class="d-flex justify-content-center align-items-center vh-100">
+
 
   <!-- Responsive card -->
   <div class="card shadow-lg border-0 rounded-4 p-4 fade-in w-100 position-relative"
