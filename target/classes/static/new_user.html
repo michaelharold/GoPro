@@ -41,16 +41,50 @@
       <!-- Right side (form) -->
       <div class="col-md-6 p-4">
         <h2 class="fw-semibold mb-4 text-center">Sign Up</h2>
-        <form action="http://localhost:8080/api/register" method="POST">
-          <input type="email" class="form-control mb-3 rounded-pill" placeholder="Email" required>
-          <input type="password" class="form-control mb-3 rounded-pill" placeholder="New Password" required>
-          <input type="password" class="form-control mb-3 rounded-pill" placeholder="Re-Type Password" required>
+        <form id="signup-form">
+          <input type="email" name="email" class="form-control mb-3 rounded-pill" placeholder="Email" required>
+          <input type="password" name="password" class="form-control mb-3 rounded-pill" placeholder="New Password" required>
+          <input type="password" name="confirmPassword" class="form-control mb-3 rounded-pill" placeholder="Re-Type Password" required>
           <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2">Sign Up</button>
-          <a href="/login.html" class="d-block mt-3 text-decoration-none text-primary text-center">Already a User? Sign In</a>
+          <a href="/index.html" class="d-block mt-3 text-decoration-none text-primary text-center">Already a User? Sign In</a>
         </form>
       </div>
     </div>
   </div>
+
+<script>
+  document.getElementById('signup-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const form = event.target;
+    const email = form.email.value.trim();
+    const password = form.password.value;
+    const confirmPassword = form.confirmPassword.value;
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        window.location.href = '/index.html';
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Registration failed.');
+      }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
+    }
+  });
+</script>
 
 </body>
 </html>
