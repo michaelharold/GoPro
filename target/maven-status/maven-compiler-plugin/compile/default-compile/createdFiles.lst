@@ -1,0 +1,6 @@
+com/GoPRO/GoPRO/entity/User.class
+com/GoPRO/GoPRO/repository/UserRepository.class
+com/GoPRO/GoPRO/GoProApplication.class
+com/GoPRO/GoPRO/AppConfig.class
+com/GoPRO/GoPRO/controller/AuthController.class
+com/GoPRO/GoPRO/SecurityConfig.class
