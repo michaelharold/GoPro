@@ -17,26 +17,26 @@
       <h2 class="title">Plan Up</h2>
       <p class="subtitle">LET’S GET U READY</p>
 
-      <form>
+      <form id="budgetForm">
         <div class="form-row">
           <span class="form-label">Budget</span>
-          <input type="number" placeholder="Enter Budget">
+          <input type="number" id="budget" name="budget" placeholder="Enter Budget">
         </div>
 
         <div class="form-row">
           <span class="form-label">No of Days</span>
-          <input type="number" placeholder="Enter Days">
+          <input type="number" id="days" name="days" placeholder="Enter Days">
         </div>
 
         <div class="form-row">
           <span class="form-label">Date</span>
-          <input type="date">
+          <input type="date" id="date" name="date">
         </div>
 
         <div class="form-group transport-buttons">
-  <button type="button" class="btn-option">Flight</button>
-  <button type="button" class="btn-option">Bus</button>
-  <button type="button" class="btn-option">Train</button>
+  <button type="button" class="btn-option" data-value="Flight">Flight</button>
+  <button type="button" class="btn-option" data-value="Bus">Bus</button>
+  <button type="button" class="btn-option" data-value="Train">Train</button>
 </div>
 
 <div class="form-group">
@@ -50,5 +50,57 @@
       <img src="/images/bag-removebg.png" alt="Bag">
     </div> -->
   </div>
+</body>
+<script>
+// JavaScript for handling transport selection and form submission
+let selectedTransport = null;
+const transportButtons = document.querySelectorAll('.btn-option');
+transportButtons.forEach(btn => {
+  btn.addEventListener('click', function() {
+    transportButtons.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedTransport = btn.getAttribute('data-value');
+  });
+});
+
+document.getElementById('budgetForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  // Replace with appropriate userId retrieval logic as needed
+  const userId = window.userId || 1;
+  const budget = document.getElementById('budget').value;
+  const days = document.getElementById('days').value;
+  const date = document.getElementById('date').value;
+  const transport = selectedTransport;
+
+  if (!budget || !days || !date || !transport) {
+    alert('Please fill all fields and select a transport option.');
+    return;
+  }
+  const data = {
+    userId,
+    budget,
+    days,
+    date,
+    transport
+  };
+  try {
+    const response = await fetch('/api/budget/set', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    if (response.ok) {
+      alert('Budget settings saved successfully!');
+      // Optionally redirect or reset form here
+    } else {
+      alert('Failed to save budget settings.');
+    }
+  } catch (err) {
+    alert('An error occurred while saving settings.');
+  }
+});
+</script>
 </body>
 </html>
