@@ -58,3 +58,101 @@
       from { opacity: 0; transform: translateX(-10px); }
       to { opacity: 1; transform: translateX(0); }
     }
+
+.budget-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+.budget-container {
+  width: 360px;
+  background: #ffb84d;
+  padding: 40px 20px 30px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: inset 0 0 0 4px #e6a63d; /* inner dark yellow border */
+  position: relative;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.form-label {
+  background: #fcd488;   /* light beige label */
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-right: 10px;
+  flex-shrink: 0;
+  min-width: 100px;
+  text-align: center;
+  font-family: 'Nunito', sans-serif; /* Professional heading font */
+  font-weight: 600; /* Slightly bold for labels */
+  font-size: 16px; /* Adjust size as needed */
+  color: #333; /* Optional: a clean dark color */
+}
+
+.form-row input {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  background: #f7f7f7;
+  font-size: 14px;
+}
+
+.form-row input:focus {
+  border: 2px solid #333;
+  background: #fff;
+}
+
+/* Transport buttons */
+.transport-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+
+.btn-option {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 20px;
+  background: #fff;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.btn-option:hover {
+  background: #ffb84d;
+  color: #fff;
+}
+
+/* Proceed button */
+.btn-proceed {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background: #ff9900;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s ease;
+}
+
+.btn-proceed:hover {
+  background: #e68a00;
+}
