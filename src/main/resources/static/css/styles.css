@@ -121,22 +121,34 @@
 }
 
 .btn-option {
-  flex: 1;
-  margin: 0 5px;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
-  background: #fff;
-  color: #333;
-  font-weight: bold;
+  background-color: #fdfdfd;       /* clean white background */
+  border: 2px solid #fbc02d;       /* theme yellow border */
+  border-radius: 25px;
+  padding: 10px 30px;
+  margin: 10px 8px;
   cursor: pointer;
-  transition: 0.3s ease;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.25s ease-in-out;
+  min-width: 100px;
+  text-align: center;
+  color: #333;                     /* dark text for readability */
 }
 
 .btn-option:hover {
-  background: #ffb84d;
-  color: #fff;
+  background-color: #fff3cd;       /* soft yellow hover */
+  border-color: #f9a825;           /* deeper yellow */
+  color: #222;
 }
+
+.btn-option.selected {
+  background-color: #fbc02d;       /* strong theme yellow */
+  border-color: #f9a825;
+  color: #fff;                     /* white text on highlight */
+  box-shadow: 0 4px 12px rgba(251, 192, 45, 0.4); /* soft glow */
+}
+
 
 /* Proceed button */
 .btn-proceed {
