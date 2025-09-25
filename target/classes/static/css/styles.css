@@ -73,7 +73,7 @@
   padding: 40px 20px 30px;
   border-radius: 25px;
   text-align: center;
-  box-shadow: inset 0 0 0 4px #e6a63d; /* inner dark yellow border */
+  box-shadow: inset 0 0 0 4px #f0f0f0; /* inner dark yellow border */
   position: relative;
 }
 
@@ -144,7 +144,7 @@
 
 .btn-option.selected {
   background-color: #fbc02d;       /* strong theme yellow */
-  border-color: #f9a825;
+  border-color: #f9f9f9;
   color: #fff;                     /* white text on highlight */
   box-shadow: 0 4px 12px rgba(251, 192, 45, 0.4); /* soft glow */
 }
