@@ -1,6 +1,7 @@
 package com.GoPRO.GoPRO.controller;
 
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,9 +24,17 @@ public class BudgetController {
     private BudgetRepository budgetRepository;
 
     @PostMapping("/set")
-    public Budget setBudget(@RequestBody Budget budget) {
-        return budgetRepository.save(budget);
-    }
+public ResponseEntity<Budget> setBudget(@RequestBody Budget budget) {
+    // Compute 70/30 split
+    budget.setTravelBudget(budget.getTotalBudget() * 0.7);
+    budget.setAccommodationBudget(budget.getTotalBudget() * 0.3);
+
+    // Save to database
+    Budget saved = budgetRepository.save(budget);
+
+    // Return saved budget as JSON
+    return ResponseEntity.ok(saved);
+}
 
     @GetMapping("/{userId}")
     public List<Budget> getUserBudgets(@PathVariable Long userId) {

@@ -27,8 +27,8 @@ public class Budget {
         this.days = days;
         this.date = date;
         this.transport = transport;
-        this.travelBudget=totalBudget*0.3;
-        this.accommodationBudget=totalBudget*0.7;
+        this.travelBudget = totalBudget * 0.7;           // 70% for travel
+        this.accommodationBudget = totalBudget * 0.3;   // 30% for accommodation
     }
 
     // Getters and Setters
@@ -49,4 +49,10 @@ public class Budget {
 
     public String getTransport() { return transport; }
     public void setTransport(String transport) { this.transport = transport; }
+
+    public Double getTravelBudget() { return travelBudget; }
+    public void setTravelBudget(Double travelBudget) { this.travelBudget = travelBudget; }
+
+    public Double getAccommodationBudget() { return accommodationBudget; }
+    public void setAccommodationBudget(Double accommodationBudget) { this.accommodationBudget = accommodationBudget; }
 }

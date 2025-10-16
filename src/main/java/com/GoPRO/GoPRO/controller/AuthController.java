@@ -42,6 +42,7 @@ public class AuthController {
         if (existing.isPresent() && passwordEncoder.matches(user.getPassword(), existing.get().getPassword())) {
             return ResponseEntity.ok("Login successful");
         }
+        
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
 }
