@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bus Selection</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h2>Available Buses</h2>
+<div id="bus-list"></div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const budget = urlParams.get('budget');
+const from = urlParams.get('from');
+const to = urlParams.get('to');
+const date = urlParams.get('date');
+
+async function fetchBuses() {
+  try {
+    const res = await fetch(`/api/buses?budget=${budget}&from=${from}&to=${to}&date=${date}`);
+    const buses = await res.json();
+    const container = document.getElementById('bus-list');
+
+    if (buses.length === 0) {
+      container.innerHTML = "<p>No buses available within your budget</p>";
+      return;
+    }
+
+    container.innerHTML = buses.map(bus => `
+      <div class="bus-card">
+        <p><strong>${bus.busName}</strong></p>
+        <p>${bus.from} → ${bus.to}</p>
+        <p>Date: ${bus.date}</p>
+        <p>Price: ₹${bus.price}</p>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error(err);
+    alert('Error fetching buses');
+  }
+}
+
+fetchBuses();
+</script>
+</body>
+</html>
