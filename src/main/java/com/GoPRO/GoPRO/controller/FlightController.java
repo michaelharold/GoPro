@@ -11,17 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.GoPRO.GoPRO.entity.FlightDTO;
 import com.GoPRO.GoPRO.service.FlightService;
-
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/flights")
+@CrossOrigin(origins="*")
 public class FlightController {
 
     @Autowired
     private FlightService flightService;
 
-    @GetMapping("/flights")
-    public List<FlightDTO> getFlights(@RequestParam Double budget) {
-        return flightService.getFlightsUnderBudget(budget);
+    @GetMapping
+    public List<FlightDTO> getFlights(@RequestParam Double budget,
+                                      @RequestParam String from,
+                                      @RequestParam String to,
+                                      @RequestParam String date) {
+        return flightService.getFlights(budget, from, to, date);
     }
 }

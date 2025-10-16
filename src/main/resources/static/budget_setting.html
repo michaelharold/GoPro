@@ -5,46 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plan Up - Budget Settings</title>
   <link rel="stylesheet" href="/css/styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="budget-wrapper">
-    <div class="budget-container">
-      <div class="avatar-container">
-        <img src="/images/logo_removebg.png" alt="Logo">
+<div class="budget-wrapper">
+  <div class="budget-container">
+    <h2>Plan Up</h2>
+    <p>LET’S GET U READY</p>
+
+    <form id="budgetForm">
+      <!-- Budget / Days / Date -->
+      <div class="form-row">
+        <span class="form-label">Budget</span>
+        <input type="number" id="budget" name="budget" placeholder="Enter Budget" required>
+      </div>
+      <div class="form-row">
+        <span class="form-label">No of Days</span>
+        <input type="number" id="days" name="days" placeholder="Enter Days" required>
+      </div>
+      <div class="form-row">
+        <span class="form-label">Date</span>
+        <input type="date" id="date" name="date" required>
       </div>
 
-      <h2 class="title">Plan Up</h2>
-      <p class="subtitle">LET’S GET U READY</p>
+      <!-- Transport -->
+      <div class="form-group transport-buttons">
+        <button type="button" class="btn-option" data-value="Flight">Flight</button>
+        <button type="button" class="btn-option" data-value="Bus">Bus</button>
+        <button type="button" class="btn-option" data-value="Train">Train</button>
+      </div>
 
-      <form id="budgetForm">
+      <!-- Destination (hidden initially) -->
+      <div id="destinationFields" style="display:none;">
         <div class="form-row">
-          <span class="form-label">Budget</span>
-          <input type="number" id="budget" name="budget" placeholder="Enter Budget" required>
+          <span class="form-label">From</span>
+          <input type="text" id="from" name="from" placeholder="Departure City">
         </div>
-
         <div class="form-row">
-          <span class="form-label">No of Days</span>
-          <input type="number" id="days" name="days" placeholder="Enter Days" required>
+          <span class="form-label">To</span>
+          <input type="text" id="to" name="to" placeholder="Destination City">
         </div>
+      </div>
 
-        <div class="form-row">
-          <span class="form-label">Date</span>
-          <input type="date" id="date" name="date" required>
-        </div>
-
-        <div class="form-group transport-buttons">
-          <button type="button" class="btn-option" data-value="Flight">Flight</button>
-          <button type="button" class="btn-option" data-value="Bus">Bus</button>
-          <button type="button" class="btn-option" data-value="Train">Train</button>
-        </div>
-
-        <div class="form-group">
-          <button type="submit" class="btn-proceed">Proceed</button>
-        </div>
-      </form>
-    </div>
+      <div class="form-group">
+        <button type="submit" class="btn-proceed" disabled>Proceed</button>
+      </div>
+    </form>
   </div>
+</div>
 
 <script>
 // Variables
@@ -53,40 +60,49 @@ const transportButtons = document.querySelectorAll('.btn-option');
 const budgetInput = document.getElementById('budget');
 const daysInput = document.getElementById('days');
 const dateInput = document.getElementById('date');
+const fromInput = document.getElementById('from');
+const toInput = document.getElementById('to');
+const destinationFields = document.getElementById('destinationFields');
 const proceedBtn = document.querySelector('.btn-proceed');
 
-// Disable Proceed initially
-proceedBtn.disabled = true;
-
-// Form validation
-function validateForm() {
-  if (budgetInput.value && daysInput.value && dateInput.value && selectedTransport) {
-    proceedBtn.disabled = false;
-  } else {
-    proceedBtn.disabled = true;
-  }
-}
-
-// Toggle transport selection
+// Show destination fields on transport select
 transportButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', function() {
     transportButtons.forEach(b => b.classList.remove('selected'));
     if (selectedTransport === btn.getAttribute('data-value')) {
       selectedTransport = null;
+      destinationFields.style.display = 'none';
     } else {
       btn.classList.add('selected');
       selectedTransport = btn.getAttribute('data-value');
+      if (selectedTransport === 'Flight' || selectedTransport === 'Bus' || selectedTransport === 'Train') {
+        destinationFields.style.display = 'block';
+      } else {
+        destinationFields.style.display = 'none';
+      }
     }
     validateForm();
   });
 });
 
-// Validate inputs on change
-[budgetInput, daysInput, dateInput].forEach(input => {
-  input.addEventListener('input', validateForm);
+// Validate form
+function validateForm() {
+  if (budgetInput.value && daysInput.value && dateInput.value && selectedTransport) {
+    if (selectedTransport === 'Flight' || selectedTransport === 'Bus' || selectedTransport === 'Train') {
+      proceedBtn.disabled = !(fromInput.value && toInput.value);
+    } else {
+      proceedBtn.disabled = false;
+    }
+  } else {
+    proceedBtn.disabled = true;
+  }
+}
+
+[budgetInput, daysInput, dateInput, fromInput, toInput].forEach(el => {
+  el.addEventListener('input', validateForm);
 });
 
-// Handle form submit
+// Submit form
 document.getElementById('budgetForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (proceedBtn.disabled) return;
@@ -99,8 +115,10 @@ document.getElementById('budgetForm').addEventListener('submit', async function(
     days: parseInt(daysInput.value),
     date: dateInput.value,
     transport: selectedTransport,
-    travelBudget: totalBudget * 0.7,         // 70% for travel
-    accommodationBudget: totalBudget * 0.3  // 30% for accommodation
+    travelBudget: totalBudget * 0.7,
+    accommodationBudget: totalBudget * 0.3,
+    from: fromInput.value.trim(),
+    to: toInput.value.trim()
   };
 
   try {
@@ -110,24 +128,20 @@ document.getElementById('budgetForm').addEventListener('submit', async function(
       body: JSON.stringify(data)
     });
 
-    if (!response.ok) {
-      alert('Failed to save budget settings.');
-      return;
-    }
+    if (!response.ok) throw new Error('Failed to save budget');
 
     const savedBudget = await response.json();
-    console.log(savedBudget); // Debug: check backend response
 
     // Redirect based on transport
     if (selectedTransport === 'Flight') {
-      window.location.href = `/flight_selection.html?budget=${savedBudget.travelBudget}`;
+      window.location.href = `/flight_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
     } else {
       window.location.href = '/under_progress.html';
     }
 
   } catch (err) {
     console.error(err);
-    alert('An error occurred while saving settings.');
+    alert('Error saving data.');
   }
 });
 </script>
