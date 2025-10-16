@@ -15,12 +15,12 @@ public class Budget {
     private Long userId;
     private Double totalBudget;
     private Integer days;
-    private String date;
+    private String date; // can change to LocalDate later
     private String transport;
     private Double travelBudget;
     private Double accommodationBudget;
-    private String from;
-    private String to;
+    private String from; // new
+    private String to;   // new
 
     public Budget() {}
 
@@ -30,10 +30,10 @@ public class Budget {
         this.days = days;
         this.date = date;
         this.transport = transport;
-        this.travelBudget = totalBudget * 0.7;
-        this.accommodationBudget = totalBudget * 0.3;
         this.from = from;
         this.to = to;
+        this.travelBudget = totalBudget * 0.7;
+        this.accommodationBudget = totalBudget * 0.3;
     }
 
     // Getters & Setters

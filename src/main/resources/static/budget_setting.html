@@ -64,63 +64,47 @@ const toInput = document.getElementById('to');
 const destinationFields = document.getElementById('destinationFields');
 const proceedBtn = document.querySelector('.btn-proceed');
 
-// Show/hide destination fields on transport selection
+// Show destination fields for transport selection
 transportButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     transportButtons.forEach(b => b.classList.remove('selected'));
+    selectedTransport = btn.getAttribute('data-value');
+    btn.classList.add('selected');
 
-    const transport = btn.getAttribute('data-value');
-    if (selectedTransport === transport) {
-      selectedTransport = null;
-      destinationFields.style.display = 'none';
+    if (selectedTransport === 'Flight' || selectedTransport === 'Bus' || selectedTransport === 'Train') {
+      destinationFields.style.display = 'block';
     } else {
-      btn.classList.add('selected');
-      selectedTransport = transport;
-      if (['Flight', 'Bus', 'Train'].includes(selectedTransport)) {
-        destinationFields.style.display = 'block';
-      } else {
-        destinationFields.style.display = 'none';
-      }
+      destinationFields.style.display = 'none';
     }
     validateForm();
   });
 });
 
-// Validate form inputs
+// Validation
 function validateForm() {
-  const baseValid = budgetInput.value && daysInput.value && dateInput.value && selectedTransport;
-  if (!baseValid) {
-    proceedBtn.disabled = true;
-    return;
+  let valid = budgetInput.value && daysInput.value && dateInput.value && selectedTransport;
+  if (valid && (selectedTransport === 'Flight' || selectedTransport === 'Bus' || selectedTransport === 'Train')) {
+    valid = fromInput.value && toInput.value;
   }
-
-  if (['Flight', 'Bus', 'Train'].includes(selectedTransport)) {
-    proceedBtn.disabled = !(fromInput.value.trim() && toInput.value.trim());
-  } else {
-    proceedBtn.disabled = false;
-  }
+  proceedBtn.disabled = !valid;
 }
 
-// Listen for changes
-[budgetInput, daysInput, dateInput, fromInput, toInput].forEach(el => {
-  el.addEventListener('input', validateForm);
-});
+// Input listeners
+[budgetInput, daysInput, dateInput, fromInput, toInput].forEach(el => el.addEventListener('input', validateForm));
 
-// Submit form
-document.getElementById('budgetForm').addEventListener('submit', async (e) => {
+// Submit handler
+document.getElementById('budgetForm').addEventListener('submit', async e => {
   e.preventDefault();
   if (proceedBtn.disabled) return;
 
   const userId = window.userId || 1;
-  const totalBudget = parseFloat(budgetInput.value);
+
   const data = {
     userId,
-    totalBudget,
+    totalBudget: parseFloat(budgetInput.value),
     days: parseInt(daysInput.value),
     date: dateInput.value,
     transport: selectedTransport,
-    travelBudget: totalBudget * 0.7,
-    accommodationBudget: totalBudget * 0.3,
     from: fromInput.value.trim(),
     to: toInput.value.trim()
   };
@@ -147,7 +131,7 @@ document.getElementById('budgetForm').addEventListener('submit', async (e) => {
 
   } catch (err) {
     console.error(err);
-    alert('Error saving data.');
+    alert('Failed to save budget.');
   }
 });
 </script>
