@@ -1,9 +1,12 @@
 package com.GoPRO.GoPRO.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
+
 
 @Entity
 public class Budget {
@@ -18,8 +21,13 @@ public class Budget {
     private String transport;
     private Double travelBudget;
     private Double accommodationBudget;
+
+    @Column(name = "\"from\"")
     private String from;   // Departure city
+
+    @Column(name = "\"to\"")
     private String to;     // Destination city
+
 
     public Budget() {}
 
