@@ -8,11 +8,11 @@
 </head>
 <body>
 <h2>Available Buses</h2>
-<div id="bus-list"></div>
+<div id="busList"></div>
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-const budget = urlParams.get('budget');
+const budget = parseFloat(urlParams.get('budget'));
 const from = urlParams.get('from');
 const to = urlParams.get('to');
 const date = urlParams.get('date');
@@ -20,25 +20,25 @@ const date = urlParams.get('date');
 async function fetchBuses() {
   try {
     const res = await fetch(`/api/buses?budget=${budget}&from=${from}&to=${to}&date=${date}`);
+    if (!res.ok) throw new Error('Failed to fetch buses');
     const buses = await res.json();
-    const container = document.getElementById('bus-list');
+    const busListDiv = document.getElementById('busList');
 
-    if (buses.length === 0) {
-      container.innerHTML = "<p>No buses available within your budget</p>";
+    if (!buses || buses.length === 0) {
+      busListDiv.innerHTML = `<p>No buses available within your budget.</p>`;
       return;
     }
 
-    container.innerHTML = buses.map(bus => `
-      <div class="bus-card">
-        <p><strong>${bus.busName}</strong></p>
-        <p>${bus.from} → ${bus.to}</p>
-        <p>Date: ${bus.date}</p>
-        <p>Price: ₹${bus.price}</p>
-      </div>
-    `).join('');
+    let html = '<ul>';
+    buses.forEach(bus => {
+      html += `<li>${bus.name} | From: ${bus.from} | To: ${bus.to} | Date: ${bus.date} | Price: ₹${bus.price}</li>`;
+    });
+    html += '</ul>';
+    busListDiv.innerHTML = html;
+
   } catch (err) {
     console.error(err);
-    alert('Error fetching buses');
+    alert('Error fetching buses.');
   }
 }
 

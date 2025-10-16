@@ -1,15 +1,13 @@
 package com.GoPRO.GoPRO.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-
-
 @Entity
 public class Budget {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,17 +15,12 @@ public class Budget {
     private Long userId;
     private Double totalBudget;
     private Integer days;
-    private String date;      // can later change to LocalDate
+    private String date;
     private String transport;
     private Double travelBudget;
     private Double accommodationBudget;
-
-    @Column(name = "\"from\"")
-    private String from;   // Departure city
-
-    @Column(name = "\"to\"")
-    private String to;     // Destination city
-
+    private String from;
+    private String to;
 
     public Budget() {}
 
@@ -37,10 +30,10 @@ public class Budget {
         this.days = days;
         this.date = date;
         this.transport = transport;
-        this.from = from;
-        this.to = to;
         this.travelBudget = totalBudget * 0.7;
         this.accommodationBudget = totalBudget * 0.3;
+        this.from = from;
+        this.to = to;
     }
 
     // Getters & Setters

@@ -11,9 +11,9 @@ import com.GoPRO.GoPRO.entity.BusDTO;
 public class BusService {
 
     private List<BusDTO> allBuses = List.of(
-        new BusDTO("VRL Travels", "BOM", "PUN", "2025-10-16", 1500.0),
-        new BusDTO("Neeta", "BOM", "PUN", "2025-10-16", 1200.0),
-        new BusDTO("KPN", "BOM", "DEL", "2025-10-16", 2500.0)
+        new BusDTO("Volvo Express", "BOM", "DEL", "2025-10-16", 5000.0),
+        new BusDTO("SRS Travels", "BOM", "DEL", "2025-10-16", 7000.0),
+        new BusDTO("RedBus Deluxe", "BOM", "DEL", "2025-10-16", 9000.0)
     );
 
     public List<BusDTO> getBuses(Double budget, String from, String to, String date) {

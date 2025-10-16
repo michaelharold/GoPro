@@ -1,14 +1,14 @@
 package com.GoPRO.GoPRO.entity;
 
 public class BusDTO {
-    private String busName;
+    private String name;
     private String from;
     private String to;
     private String date;
     private Double price;
 
-    public BusDTO(String busName, String from, String to, String date, Double price) {
-        this.busName = busName;
+    public BusDTO(String name, String from, String to, String date, Double price) {
+        this.name = name;
         this.from = from;
         this.to = to;
         this.date = date;
@@ -16,8 +16,8 @@ public class BusDTO {
     }
 
     // Getters & Setters
-    public String getBusName() { return busName; }
-    public void setBusName(String busName) { this.busName = busName; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public String getFrom() { return from; }
     public void setFrom(String from) { this.from = from; }
