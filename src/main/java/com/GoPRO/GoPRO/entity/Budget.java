@@ -16,6 +16,8 @@ public class Budget {
     private Integer days;
     private String date;      // can later change to LocalDate
     private String transport;
+    private Double travelBudget;
+    private Double accommodationBudget;
 
     public Budget() {}
 
@@ -25,6 +27,8 @@ public class Budget {
         this.days = days;
         this.date = date;
         this.transport = transport;
+        this.travelBudget=totalBudget*0.3;
+        this.accommodationBudget=totalBudget*0.7;
     }
 
     // Getters and Setters
