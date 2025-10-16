@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.GoPRO.GoPRO.entity.FlightDTO;
 import com.GoPRO.GoPRO.service.FlightService;
+
 @RestController
 @RequestMapping("/api/flights")
-@CrossOrigin(origins="*")
+@CrossOrigin(origins = "*")
 public class FlightController {
 
     @Autowired

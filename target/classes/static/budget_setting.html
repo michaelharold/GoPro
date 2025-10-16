@@ -110,16 +110,16 @@ document.getElementById('budgetForm').addEventListener('submit', async function(
   const userId = window.userId || 1;
   const totalBudget = parseFloat(budgetInput.value);
   const data = {
-    userId,
-    totalBudget,
-    days: parseInt(daysInput.value),
-    date: dateInput.value,
-    transport: selectedTransport,
-    travelBudget: totalBudget * 0.7,
-    accommodationBudget: totalBudget * 0.3,
-    from: fromInput.value.trim(),
-    to: toInput.value.trim()
-  };
+  userId,
+  totalBudget: parseFloat(budgetInput.value),
+  days: parseInt(daysInput.value),
+  date: dateInput.value,
+  transport: selectedTransport,
+  travelBudget: parseFloat(budgetInput.value) * 0.7,
+  accommodationBudget: parseFloat(budgetInput.value) * 0.3,
+  from: fromInput.value.trim(),
+  to: toInput.value.trim()
+};
 
   try {
     const response = await fetch('/api/budget/set', {

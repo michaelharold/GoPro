@@ -15,7 +15,7 @@ public class FlightDTO {
         this.price = price;
     }
 
-    // Getters and setters
+    // Getters & Setters
     public String getAirline() { return airline; }
     public void setAirline(String airline) { this.airline = airline; }
     public String getFrom() { return from; }

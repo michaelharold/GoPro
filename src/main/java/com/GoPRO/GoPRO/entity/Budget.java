@@ -18,20 +18,24 @@ public class Budget {
     private String transport;
     private Double travelBudget;
     private Double accommodationBudget;
+    private String from;   // Departure city
+    private String to;     // Destination city
 
     public Budget() {}
 
-    public Budget(Long userId, Double totalBudget, Integer days, String date, String transport) {
+    public Budget(Long userId, Double totalBudget, Integer days, String date, String transport, String from, String to) {
         this.userId = userId;
         this.totalBudget = totalBudget;
         this.days = days;
         this.date = date;
         this.transport = transport;
-        this.travelBudget = totalBudget * 0.7;           // 70% for travel
-        this.accommodationBudget = totalBudget * 0.3;   // 30% for accommodation
+        this.from = from;
+        this.to = to;
+        this.travelBudget = totalBudget * 0.7;
+        this.accommodationBudget = totalBudget * 0.3;
     }
 
-    // Getters and Setters
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -55,4 +59,10 @@ public class Budget {
 
     public Double getAccommodationBudget() { return accommodationBudget; }
     public void setAccommodationBudget(Double accommodationBudget) { this.accommodationBudget = accommodationBudget; }
+
+    public String getFrom() { return from; }
+    public void setFrom(String from) { this.from = from; }
+
+    public String getTo() { return to; }
+    public void setTo(String to) { this.to = to; }
 }

@@ -24,17 +24,13 @@ public class BudgetController {
     private BudgetRepository budgetRepository;
 
     @PostMapping("/set")
-public ResponseEntity<Budget> setBudget(@RequestBody Budget budget) {
-    // Compute 70/30 split
-    budget.setTravelBudget(budget.getTotalBudget() * 0.7);
-    budget.setAccommodationBudget(budget.getTotalBudget() * 0.3);
+    public ResponseEntity<Budget> setBudget(@RequestBody Budget budget) {
+        budget.setTravelBudget(budget.getTotalBudget() * 0.7);
+        budget.setAccommodationBudget(budget.getTotalBudget() * 0.3);
 
-    // Save to database
-    Budget saved = budgetRepository.save(budget);
-
-    // Return saved budget as JSON
-    return ResponseEntity.ok(saved);
-}
+        Budget saved = budgetRepository.save(budget);
+        return ResponseEntity.ok(saved);
+    }
 
     @GetMapping("/{userId}")
     public List<Budget> getUserBudgets(@PathVariable Long userId) {
