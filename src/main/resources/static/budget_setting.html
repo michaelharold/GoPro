@@ -64,14 +64,14 @@ const toInput = document.getElementById('to');
 const destinationFields = document.getElementById('destinationFields');
 const proceedBtn = document.querySelector('.btn-proceed');
 
-// Show destination fields for transport selection
+// Toggle transport selection and show destination fields
 transportButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     transportButtons.forEach(b => b.classList.remove('selected'));
     selectedTransport = btn.getAttribute('data-value');
     btn.classList.add('selected');
 
-    if (selectedTransport === 'Flight' || selectedTransport === 'Bus' || selectedTransport === 'Train') {
+    if (['Flight','Bus','Train'].includes(selectedTransport)) {
       destinationFields.style.display = 'block';
     } else {
       destinationFields.style.display = 'none';
@@ -80,11 +80,11 @@ transportButtons.forEach(btn => {
   });
 });
 
-// Validation
+// Form validation
 function validateForm() {
   let valid = budgetInput.value && daysInput.value && dateInput.value && selectedTransport;
-  if (valid && (selectedTransport === 'Flight' || selectedTransport === 'Bus' || selectedTransport === 'Train')) {
-    valid = fromInput.value && toInput.value;
+  if (valid && ['Flight','Bus','Train'].includes(selectedTransport)) {
+    valid = fromInput.value.trim() && toInput.value.trim();
   }
   proceedBtn.disabled = !valid;
 }
@@ -98,15 +98,18 @@ document.getElementById('budgetForm').addEventListener('submit', async e => {
   if (proceedBtn.disabled) return;
 
   const userId = window.userId || 1;
+  const totalBudget = parseFloat(budgetInput.value);
 
   const data = {
     userId,
-    totalBudget: parseFloat(budgetInput.value),
+    totalBudget,
     days: parseInt(daysInput.value),
     date: dateInput.value,
     transport: selectedTransport,
     from: fromInput.value.trim(),
-    to: toInput.value.trim()
+    to: toInput.value.trim(),
+    travelBudget: totalBudget * 0.7,
+    accommodationBudget: totalBudget * 0.3
   };
 
   try {
@@ -125,13 +128,15 @@ document.getElementById('budgetForm').addEventListener('submit', async e => {
       window.location.href = `/flight_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
     } else if (selectedTransport === 'Bus') {
       window.location.href = `/bus_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
+    } else if (selectedTransport === 'Train') {
+      window.location.href = `/train_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
     } else {
-      window.location.href = '/under_progress.html';
+      alert('Unknown transport type selected.');
     }
 
   } catch (err) {
     console.error(err);
-    alert('Failed to save budget.');
+    alert('Failed to save budget. Check server logs.');
   }
 });
 </script>

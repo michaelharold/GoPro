@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Train Selection</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h2>Select Your Train</h2>
+  <div id="trainList"></div>
+
+<script>
+async function loadTrains() {
+  const params = new URLSearchParams(window.location.search);
+  const budget = params.get('budget');
+  const from = params.get('from');
+  const to = params.get('to');
+  const date = params.get('date');
+
+  try {
+    const response = await fetch(`/api/trains?budget=${budget}&from=${from}&to=${to}&date=${date}`);
+    if (!response.ok) throw new Error('Failed to fetch trains');
+
+    const trains = await response.json();
+    const trainList = document.getElementById('trainList');
+    trainList.innerHTML = '';
+
+    if (trains.length === 0) {
+      trainList.innerHTML = '<p>No trains available within your budget.</p>';
+    } else {
+      trains.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'train-item';
+        div.innerHTML = `<strong>${t.name}</strong> | ${t.from} → ${t.to} | ₹${t.price} | ${t.date}`;
+        trainList.appendChild(div);
+      });
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Error fetching trains.');
+  }
+}
+
+window.onload = loadTrains;
+</script>
+</body>
+</html>
