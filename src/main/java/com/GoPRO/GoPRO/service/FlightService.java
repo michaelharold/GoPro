@@ -16,26 +16,23 @@ public class FlightService {
     public FlightService() {
         allFlights = new ArrayList<>();
 
-        // For convenience create mock flights across several common routes/dates/prices
-        // Two dates as examples; add more if you want
         String[] dates = { "2025-10-16", "2025-10-17", "2025-10-18" };
-        // common airport codes used in app
+        // use city names now instead of airport codes
         String[][] routes = {
-            { "BOM", "DEL" },
-            { "BOM", "BLR" },
-            { "BOM", "MAA" },
-            { "DEL", "BLR" },
-            { "BLR", "HYD" },
-            { "CCU", "BOM" }
+            { "Mumbai", "Delhi" },
+            { "Mumbai", "Bangalore" },
+            { "Mumbai", "Chennai" },
+            { "Delhi", "Bangalore" },
+            { "Bangalore", "Hyderabad" },
+            { "Kolkata", "Mumbai" }
         };
 
-        // generate multiple flights per route/date with varied prices and times
         int counter = 100;
         for (String date : dates) {
             for (String[] route : routes) {
                 String from = route[0];
                 String to = route[1];
-                // create several airlines/prices/times for each route/date
+
                 allFlights.add(new FlightDTO("IndiGo", "6E" + (counter++), from, to, date, 3500.0, "06:00", "08:00"));
                 allFlights.add(new FlightDTO("SpiceJet", "SG" + (counter++), from, to, date, 4200.0, "08:30", "10:30"));
                 allFlights.add(new FlightDTO("Air India", "AI" + (counter++), from, to, date, 5200.0, "11:00", "13:00"));
@@ -45,19 +42,13 @@ public class FlightService {
             }
         }
 
-        // add some more dense data for the commonly used BOM->DEL on the primary date
+        // extra mock flights for Mumbai → Delhi on primary date
         for (int i = 0; i < 5; i++) {
-            allFlights.add(new FlightDTO("MockAir", "MK" + (counter++), "BOM", "DEL", "2025-10-16", 2500.0 + i * 500, String.format("%02d:00", 6 + i), String.format("%02d:30", 8 + i)));
+            allFlights.add(new FlightDTO("MockAir", "MK" + (counter++), "Mumbai", "Delhi", "2025-10-16", 2500.0 + i * 500,
+                                         String.format("%02d:00", 6 + i), String.format("%02d:30", 8 + i)));
         }
     }
 
-    /**
-     * Filter flights by:
-     * - date: exact match if provided (non-null)
-     * - budget: price <= budget (if provided)
-     * - from: exact match if provided
-     * - to: exact match if provided
-     */
     public List<FlightDTO> getFlights(Double budget, String from, String to, String date) {
         return allFlights.stream()
                 .filter(f -> date == null || date.isBlank() || date.equals(f.getDate()))
@@ -67,7 +58,6 @@ public class FlightService {
                 .collect(Collectors.toList());
     }
 
-    /** Optional helper to return distinct destination codes in mock data (useful for UI dropdowns) */
     public List<String> getAllDestinations() {
         return allFlights.stream()
                 .map(FlightDTO::getTo)
