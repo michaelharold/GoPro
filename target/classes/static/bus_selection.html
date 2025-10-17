@@ -5,10 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bus Selection</title>
 <link rel="stylesheet" href="/css/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  h2 { margin-bottom: 20px; }
+  ul { list-style-type: none; padding: 0; }
+  li { padding: 10px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; border-radius: 5px; }
+  li.selected { background-color: #d0f0c0; }
+  button { margin-top: 20px; padding: 10px 20px; }
+</style>
 </head>
 <body>
 <h2>Available Buses</h2>
 <div id="busList"></div>
+<button id="proceedBtn" disabled>Proceed to Booking</button>
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
@@ -16,6 +25,8 @@ const budget = parseFloat(urlParams.get('budget'));
 const from = urlParams.get('from');
 const to = urlParams.get('to');
 const date = urlParams.get('date');
+
+let selectedBus = null;
 
 async function fetchBuses() {
   try {
@@ -30,17 +41,34 @@ async function fetchBuses() {
     }
 
     let html = '<ul>';
-    buses.forEach(bus => {
-      html += `<li>${bus.name} | From: ${bus.from} | To: ${bus.to} | Date: ${bus.date} | Price: ₹${bus.price}</li>`;
+    buses.forEach((bus, index) => {
+      html += `<li data-index="${index}">${bus.name} | From: ${bus.from} | To: ${bus.to} | Date: ${bus.date} | Price: ₹${bus.price}</li>`;
     });
     html += '</ul>';
     busListDiv.innerHTML = html;
+
+    // Add click events to select a bus
+    const listItems = busListDiv.querySelectorAll('li');
+    listItems.forEach(li => {
+      li.addEventListener('click', () => {
+        listItems.forEach(item => item.classList.remove('selected'));
+        li.classList.add('selected');
+        selectedBus = buses[li.dataset.index];
+        document.getElementById('proceedBtn').disabled = false;
+      });
+    });
 
   } catch (err) {
     console.error(err);
     alert('Error fetching buses.');
   }
 }
+
+document.getElementById('proceedBtn').addEventListener('click', () => {
+  if (!selectedBus) return;
+  // Redirect to a booking page with selected bus details
+  window.location.href = `/bus_booking.html?busName=${encodeURIComponent(selectedBus.name)}&from=${selectedBus.from}&to=${selectedBus.to}&date=${selectedBus.date}&price=${selectedBus.price}`;
+});
 
 fetchBuses();
 </script>

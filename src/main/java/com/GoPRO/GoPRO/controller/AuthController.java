@@ -34,6 +34,21 @@ public String register(@RequestBody User user) {
     }
 }
 
+@PostMapping("/login")
+public String login(@RequestBody User user) {
+    try {
+        User existingUser = userService.getUser(user.getEmail());
+        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+            return "Login successful";
+        } else {
+            return "Invalid email or password";
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return "Error: " + e.getMessage();
+    }
+}
+
     @GetMapping("/{id}")
     public User getUser(@PathVariable String id) throws ExecutionException, InterruptedException {
         return userService.getUser(id);
