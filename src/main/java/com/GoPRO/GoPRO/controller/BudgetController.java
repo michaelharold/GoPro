@@ -1,7 +1,8 @@
 package com.GoPRO.GoPRO.controller;
 
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,19 +19,16 @@ import com.GoPRO.GoPRO.service.BudgetService;
 @CrossOrigin(origins = "*")
 public class BudgetController {
 
-    private final BudgetService budgetService;
+    @Autowired
+    private BudgetService budgetService;
 
-    public BudgetController(BudgetService budgetService) {
-        this.budgetService = budgetService;
-    }
-
-    @PostMapping("/save")
-    public String saveBudget(@RequestBody Budget budget) throws ExecutionException, InterruptedException {
+    @PostMapping("/set")
+    public Budget setBudget(@RequestBody Budget budget) {
         return budgetService.saveBudget(budget);
     }
 
     @GetMapping("/{userId}")
-    public Budget getBudget(@PathVariable String userId) throws ExecutionException, InterruptedException {
-        return budgetService.getBudget(userId);
+    public List<Budget> getUserBudgets(@PathVariable String userId) {
+        return budgetService.getUserBudgets(userId);
     }
 }

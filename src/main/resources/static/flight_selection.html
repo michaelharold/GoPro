@@ -1,79 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flight Selection</title>
-<link rel="stylesheet" href="/css/styles.css">
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  h2 { margin-bottom: 20px; }
-  .flight-item { padding: 10px; border: 1px solid #ccc; margin-bottom: 10px; border-radius: 5px; cursor: pointer; }
-  .flight-item.selected { background-color: #d0f0c0; }
-  button.proceed-btn { margin-top: 20px; padding: 10px 20px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flight Selection</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .search-row { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+    .search-row input { padding:8px; }
+    table { width:100%; border-collapse: collapse; margin-top:12px; }
+    th, td { border:1px solid #ddd; padding:8px; text-align:left; }
+    tr:hover { background:#f8f8f8; }
+    .clickable { cursor:pointer; color:#1a73e8; text-decoration:underline; }
+    /* simple modal */
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; }
+    .modal .box { background:white; padding:16px; width:320px; border-radius:8px; }
+    .dest-list { list-style:none; padding:0; margin:0; max-height:240px; overflow:auto; }
+    .dest-list li { padding:8px; border-bottom:1px solid #eee; cursor:pointer; }
+    .dest-list li:hover { background:#f1f1f1; }
+  </style>
 </head>
 <body>
+  <h2>Search Mock Flights</h2>
 
-<h2>Available Flights</h2>
-<div id="flightsList">Loading...</div>
-<button class="proceed-btn" id="proceedBtn" disabled>Proceed to Booking</button>
+  <div class="search-row">
+    <label>Date: <input type="date" id="date" /></label>
+    <label>Budget (₹): <input type="number" id="budget" placeholder="e.g. 5000" /></label>
+    <label>From: <input id="from" placeholder="optional (BOM, DEL...)" /></label>
+    <button id="searchBtn">Search Flights</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+
+  <div id="resultInfo"></div>
+
+  <table id="flightsTable" aria-live="polite">
+    <thead>
+      <tr>
+        <th>Airline</th>
+        <th>Flight No</th>
+        <th>From</th>
+        <th>To (click to change)</th>
+        <th>Date</th>
+        <th>Depart</th>
+        <th>Arrive</th>
+        <th>Price (₹)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Simple modal for selecting destination -->
+  <div id="destModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="box">
+      <h4>Select destination</h4>
+      <ul id="destList" class="dest-list"></ul>
+      <div style="text-align:right; margin-top:8px;">
+        <button id="closeModal">Cancel</button>
+      </div>
+    </div>
+  </div>
 
 <script>
-function getQueryParams() {
+  const searchBtn = document.getElementById('searchBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const dateInput = document.getElementById('date');
+  const budgetInput = document.getElementById('budget');
+  const fromInput = document.getElementById('from');
+  const tableBody = document.querySelector('#flightsTable tbody');
+  const resultInfo = document.getElementById('resultInfo');
+
+  const destModal = document.getElementById('destModal');
+  const destList = document.getElementById('destList');
+  const closeModal = document.getElementById('closeModal');
+
+  // store last query state
+  let lastQuery = { date: null, budget: null, from: null };
+
+  // on load: prefill date from query params if present
+  (function prefillFromQuery() {
     const params = new URLSearchParams(window.location.search);
-    return {
-        budget: params.get('budget'),
-        from: params.get('from'),
-        to: params.get('to'),
-        date: params.get('date')
-    };
-}
+    if (params.get('date')) dateInput.value = params.get('date');
+    if (params.get('budget')) budgetInput.value = params.get('budget');
+    if (params.get('from')) fromInput.value = params.get('from');
+    // optionally auto-search if both date and budget present
+  })();
 
-let selectedFlight = null;
+  searchBtn.addEventListener('click', () => {
+    fetchAndRender();
+  });
 
-async function fetchFlights() {
-    const { budget, from, to, date } = getQueryParams();
+  clearBtn.addEventListener('click', () => {
+    dateInput.value = '';
+    budgetInput.value = '';
+    fromInput.value = '';
+    tableBody.innerHTML = '';
+    resultInfo.textContent = '';
+  });
+
+  async function fetchAndRender(toOverride) {
+    const date = dateInput.value || '';
+    const budget = budgetInput.value ? parseFloat(budgetInput.value) : '';
+    const from = fromInput.value ? fromInput.value.trim() : '';
+    // store last
+    lastQuery = { date, budget, from };
+
+    // Build query string
+    const params = new URLSearchParams();
+    if (budget) params.append('budget', budget);
+    if (date) params.append('date', date);
+    if (from) params.append('from', from);
+    if (toOverride) params.append('to', toOverride);
+
+    resultInfo.textContent = 'Loading...';
+    tableBody.innerHTML = '';
+
     try {
-        const res = await fetch(`/api/flights?budget=${budget}&from=${from}&to=${to}&date=${date}`);
-        if (!res.ok) throw new Error('Failed to fetch flights');
-        const flights = await res.json();
-        const container = document.getElementById('flightsList');
+      const res = await fetch('/api/flights?' + params.toString());
+      if (!res.ok) {
+        throw new Error('Server error: ' + res.status);
+      }
+      const flights = await res.json();
+      resultInfo.textContent = `${flights.length} flights found`;
+      if (flights.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8">No flights available with the selected criteria.</td></tr>';
+        return;
+      }
 
-        if (!flights || flights.length === 0) {
-            container.innerHTML = "<p>No flights available within your budget.</p>";
-            return;
-        }
+      tableBody.innerHTML = flights.map(f => `
+        <tr data-from="${escapeHtml(f.from)}" data-to="${escapeHtml(f.to)}" data-date="${escapeHtml(f.date)}">
+          <td>${escapeHtml(f.airline)}</td>
+          <td>${escapeHtml(f.flightNumber)}</td>
+          <td>${escapeHtml(f.from)}</td>
+          <td class="clickable to-cell">${escapeHtml(f.to)}</td>
+          <td>${escapeHtml(f.date)}</td>
+          <td>${escapeHtml(f.departureTime)}</td>
+          <td>${escapeHtml(f.arrivalTime)}</td>
+          <td>${escapeHtml(Number(f.price).toFixed(2))}</td>
+        </tr>
+      `).join('');
 
-        container.innerHTML = flights.map((f, index) => 
-            `<div class="flight-item" data-index="${index}">
-                <p>${f.airline} | ${f.from} → ${f.to} | Date: ${f.date} | Price: ₹${f.price}</p>
-            </div>`
-        ).join('');
-
-        const flightItems = container.querySelectorAll('.flight-item');
-        flightItems.forEach(item => {
-            item.addEventListener('click', () => {
-                flightItems.forEach(f => f.classList.remove('selected'));
-                item.classList.add('selected');
-                selectedFlight = flights[item.dataset.index];
-                document.getElementById('proceedBtn').disabled = false;
-            });
-        });
+      // attach click handlers on .to-cell
+      document.querySelectorAll('.to-cell').forEach(cell => {
+        cell.addEventListener('click', onToCellClick);
+      });
 
     } catch (err) {
-        console.error(err);
-        document.getElementById('flightsList').innerHTML = "<p>Error fetching flights.</p>";
+      console.error(err);
+      resultInfo.textContent = 'Error fetching flights.';
+      tableBody.innerHTML = '<tr><td colspan="8">Error fetching flights.</td></tr>';
     }
-}
+  }
 
-document.getElementById('proceedBtn').addEventListener('click', () => {
-    if (!selectedFlight) return;
-    // Redirect to booking page with selected flight info
-    window.location.href = `/flight_booking.html?airline=${encodeURIComponent(selectedFlight.airline)}&from=${selectedFlight.from}&to=${selectedFlight.to}&date=${selectedFlight.date}&price=${selectedFlight.price}`;
-});
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"'`=\/]/g, function (ch) {
+      return ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[ch];
+    });
+  }
 
-fetchFlights();
+  // When clicking the "To" cell, show modal with possible mock destinations
+  async function onToCellClick(e) {
+    const cell = e.currentTarget;
+    const tr = cell.closest('tr');
+    const currentTo = cell.textContent.trim();
+    // fetch available destinations from server (mock)
+    let destinations = [];
+    try {
+      const res = await fetch('/api/flights/destinations');
+      if (res.ok) destinations = await res.json();
+    } catch (err) {
+      // fallback list
+      destinations = ['DEL','BOM','BLR','MAA','HYD','CCU'];
+    }
+
+    // Show modal and populate list (highlight currentTo)
+    destList.innerHTML = destinations.map(d => `
+      <li data-code="${d}" ${d === currentTo ? 'style="font-weight:700;"' : ''}>${d}</li>
+    `).join('');
+
+    // clicking a destination re-runs the search with that 'to' selected
+    destList.querySelectorAll('li').forEach(li => {
+      li.addEventListener('click', async (ev) => {
+        const code = ev.currentTarget.getAttribute('data-code');
+        destModal.style.display = 'none';
+        // re-run search using lastQuery and selected to
+        await fetchAndRender(code);
+        // scroll to top of results
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    destModal.style.display = 'flex';
+    destModal.setAttribute('aria-hidden', 'false');
+  }
+
+  closeModal.addEventListener('click', () => {
+    destModal.style.display = 'none';
+    destModal.setAttribute('aria-hidden', 'true');
+  });
+
+  // close modal when clicking outside the box
+  destModal.addEventListener('click', (ev) => {
+    if (ev.target === destModal) {
+      destModal.style.display = 'none';
+      destModal.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // helper: if user pressed Enter in inputs, run search
+  [dateInput, budgetInput, fromInput].forEach(el => {
+    el.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); fetchAndRender(); }});
+  });
+
+  // initial auto-search if date & budget present
+  if (dateInput.value && budgetInput.value) fetchAndRender();
+
 </script>
 </body>
 </html>

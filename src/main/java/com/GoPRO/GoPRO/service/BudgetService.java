@@ -1,26 +1,31 @@
 package com.GoPRO.GoPRO.service;
 
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
 import com.GoPRO.GoPRO.entity.Budget;
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.cloud.FirestoreClient;
 
 @Service
 public class BudgetService {
 
-    private static final String COLLECTION_NAME = "budgets";
+    // In-memory storage for budgets
+    private final ConcurrentHashMap<String, List<Budget>> userBudgets = new ConcurrentHashMap<>();
 
-    public String saveBudget(Budget budget) throws ExecutionException, InterruptedException {
-        Firestore db = FirestoreClient.getFirestore();
-        db.collection(COLLECTION_NAME).document(budget.getUserId()).set(budget).get();
-        return "Budget saved successfully!";
+    public Budget saveBudget(Budget budget) {
+        // Split budget into 70% travel, 30% accommodation
+        budget.setTravelBudget(budget.getTotalBudget() * 0.7);
+        budget.setAccommodationBudget(budget.getTotalBudget() * 0.3);
+
+        // Store in-memory
+        userBudgets.computeIfAbsent(budget.getUserId(), k -> new ArrayList<>()).add(budget);
+
+        return budget;
     }
 
-    public Budget getBudget(String userId) throws ExecutionException, InterruptedException {
-        Firestore db = FirestoreClient.getFirestore();
-        return db.collection(COLLECTION_NAME).document(userId).get().get().toObject(Budget.class);
+    public List<Budget> getUserBudgets(String userId) {
+        return userBudgets.getOrDefault(userId, new ArrayList<>());
     }
 }

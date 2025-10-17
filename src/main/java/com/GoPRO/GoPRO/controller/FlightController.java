@@ -20,11 +20,23 @@ public class FlightController {
     @Autowired
     private FlightService flightService;
 
+    /**
+     * GET /api/flights?budget=5000&from=BOM&to=DEL&date=2025-10-16
+     * - budget and date are recommended; from/to optional
+     */
     @GetMapping
-    public List<FlightDTO> getFlights(@RequestParam Double budget,
-                                      @RequestParam String from,
-                                      @RequestParam String to,
-                                      @RequestParam String date) {
+    public List<FlightDTO> getFlights(
+            @RequestParam(required = false) Double budget,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String date) {
+
         return flightService.getFlights(budget, from, to, date);
+    }
+
+    /** optional endpoint to get mock destination codes used by UI */
+    @GetMapping("/destinations")
+    public List<String> getDestinations() {
+        return flightService.getAllDestinations();
     }
 }
