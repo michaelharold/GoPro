@@ -5,9 +5,9 @@ public class BusDTO {
     private String from;
     private String to;
     private String date;
-    private Double price;
+    private double price;
 
-    public BusDTO(String name, String from, String to, String date, Double price) {
+    public BusDTO(String name, String from, String to, String date, double price) {
         this.name = name;
         this.from = from;
         this.to = to;
@@ -15,19 +15,15 @@ public class BusDTO {
         this.price = price;
     }
 
-    // Getters & Setters
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
     public String getFrom() { return from; }
-    public void setFrom(String from) { this.from = from; }
-
     public String getTo() { return to; }
-    public void setTo(String to) { this.to = to; }
-
     public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public double getPrice() { return price; }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public void setName(String name) { this.name = name; }
+    public void setFrom(String from) { this.from = from; }
+    public void setTo(String to) { this.to = to; }
+    public void setDate(String date) { this.date = date; }
+    public void setPrice(double price) { this.price = price; }
 }

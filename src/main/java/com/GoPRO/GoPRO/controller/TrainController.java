@@ -2,7 +2,6 @@ package com.GoPRO.GoPRO.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,12 +13,14 @@ import com.GoPRO.GoPRO.service.TrainService;
 
 @RestController
 @RequestMapping("/api/trains")
-
 @CrossOrigin(origins = "*")
 public class TrainController {
 
-    @Autowired
-    private TrainService trainService;
+    private final TrainService trainService;
+
+    public TrainController(TrainService trainService) {
+        this.trainService = trainService;
+    }
 
     @GetMapping
     public List<TrainDTO> getTrains(@RequestParam Double budget,
@@ -27,5 +28,10 @@ public class TrainController {
                                     @RequestParam String to,
                                     @RequestParam String date) {
         return trainService.getTrains(budget, from, to, date);
+    }
+
+    @GetMapping("/stations")
+    public List<String> getAvailableStations() {
+        return trainService.getAvailableStations();
     }
 }
