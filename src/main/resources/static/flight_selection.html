@@ -1,223 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flight Selection</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .search-row { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
-    .search-row input { padding:8px; }
-    table { width:100%; border-collapse: collapse; margin-top:12px; }
-    th, td { border:1px solid #ddd; padding:8px; text-align:left; }
-    tr:hover { background:#f8f8f8; }
-    .clickable { cursor:pointer; color:#1a73e8; text-decoration:underline; }
-    /* simple modal */
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; }
-    .modal .box { background:white; padding:16px; width:320px; border-radius:8px; }
-    .dest-list { list-style:none; padding:0; margin:0; max-height:240px; overflow:auto; }
-    .dest-list li { padding:8px; border-bottom:1px solid #eee; cursor:pointer; }
-    .dest-list li:hover { background:#f1f1f1; }
+    body { font-family: 'Nunito', sans-serif; background: #f5f7fa; padding: 30px; }
+    h2 { text-align: center; margin-bottom: 30px; color: #333; }
+    .card { border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+    .card:hover { transform: scale(1.02); }
+    .btn-success { background: #28a745; border: none; }
+    .btn-success:hover { background: #218838; }
   </style>
 </head>
 <body>
-  <h2>Search Mock Flights</h2>
 
-  <div class="search-row">
-    <label>Date: <input type="date" id="date" /></label>
-    <label>Budget (₹): <input type="number" id="budget" placeholder="e.g. 5000" /></label>
-    <label>From: <input id="from" placeholder="optional (BOM, DEL...)" /></label>
-    <button id="searchBtn">Search Flights</button>
-    <button id="clearBtn">Clear</button>
-  </div>
-
-  <div id="resultInfo"></div>
-
-  <table id="flightsTable" aria-live="polite">
-    <thead>
-      <tr>
-        <th>Airline</th>
-        <th>Flight No</th>
-        <th>From</th>
-        <th>To (click to change)</th>
-        <th>Date</th>
-        <th>Depart</th>
-        <th>Arrive</th>
-        <th>Price (₹)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <!-- Simple modal for selecting destination -->
-  <div id="destModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="box">
-      <h4>Select destination</h4>
-      <ul id="destList" class="dest-list"></ul>
-      <div style="text-align:right; margin-top:8px;">
-        <button id="closeModal">Cancel</button>
-      </div>
-    </div>
-  </div>
+<h2>Select Your Flight ✈️</h2>
+<div id="flights-container" class="row g-4"></div>
 
 <script>
-  const searchBtn = document.getElementById('searchBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const dateInput = document.getElementById('date');
-  const budgetInput = document.getElementById('budget');
-  const fromInput = document.getElementById('from');
-  const tableBody = document.querySelector('#flightsTable tbody');
-  const resultInfo = document.getElementById('resultInfo');
+async function loadFlights() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const budget = parseFloat(urlParams.get('budget'));
+  const from = urlParams.get('from');
+  const to = urlParams.get('to');
+  const date = urlParams.get('date');
+  let days = parseInt(urlParams.get('days'), 10);
 
-  const destModal = document.getElementById('destModal');
-  const destList = document.getElementById('destList');
-  const closeModal = document.getElementById('closeModal');
-
-  // store last query state
-  let lastQuery = { date: null, budget: null, from: null };
-
-  // on load: prefill date from query params if present
-  (function prefillFromQuery() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('date')) dateInput.value = params.get('date');
-    if (params.get('budget')) budgetInput.value = params.get('budget');
-    if (params.get('from')) fromInput.value = params.get('from');
-    // optionally auto-search if both date and budget present
-  })();
-
-  searchBtn.addEventListener('click', () => {
-    fetchAndRender();
-  });
-
-  clearBtn.addEventListener('click', () => {
-    dateInput.value = '';
-    budgetInput.value = '';
-    fromInput.value = '';
-    tableBody.innerHTML = '';
-    resultInfo.textContent = '';
-  });
-
-  async function fetchAndRender(toOverride) {
-    const date = dateInput.value || '';
-    const budget = budgetInput.value ? parseFloat(budgetInput.value) : '';
-    const from = fromInput.value ? fromInput.value.trim() : '';
-    // store last
-    lastQuery = { date, budget, from };
-
-    // Build query string
-    const params = new URLSearchParams();
-    if (budget) params.append('budget', budget);
-    if (date) params.append('date', date);
-    if (from) params.append('from', from);
-    if (toOverride) params.append('to', toOverride);
-
-    resultInfo.textContent = 'Loading...';
-    tableBody.innerHTML = '';
-
-    try {
-      const res = await fetch('/api/flights?' + params.toString());
-      if (!res.ok) {
-        throw new Error('Server error: ' + res.status);
-      }
-      const flights = await res.json();
-      resultInfo.textContent = `${flights.length} flights found`;
-      if (flights.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="8">No flights available with the selected criteria.</td></tr>';
-        return;
-      }
-
-      tableBody.innerHTML = flights.map(f => `
-        <tr data-from="${escapeHtml(f.from)}" data-to="${escapeHtml(f.to)}" data-date="${escapeHtml(f.date)}">
-          <td>${escapeHtml(f.airline)}</td>
-          <td>${escapeHtml(f.flightNumber)}</td>
-          <td>${escapeHtml(f.from)}</td>
-          <td class="clickable to-cell">${escapeHtml(f.to)}</td>
-          <td>${escapeHtml(f.date)}</td>
-          <td>${escapeHtml(f.departureTime)}</td>
-          <td>${escapeHtml(f.arrivalTime)}</td>
-          <td>${escapeHtml(Number(f.price).toFixed(2))}</td>
-        </tr>
-      `).join('');
-
-      // attach click handlers on .to-cell
-      document.querySelectorAll('.to-cell').forEach(cell => {
-        cell.addEventListener('click', onToCellClick);
-      });
-
-    } catch (err) {
-      console.error(err);
-      resultInfo.textContent = 'Error fetching flights.';
-      tableBody.innerHTML = '<tr><td colspan="8">Error fetching flights.</td></tr>';
-    }
+  if (isNaN(days) || days <= 0) {
+    days = 1; // fallback to 1 day if missing or invalid
   }
 
-  function escapeHtml(s) {
-    if (s == null) return '';
-    return String(s).replace(/[&<>"'`=\/]/g, function (ch) {
-      return ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      })[ch];
+  const accommodationBudget = budget * 0.3;
+
+  try {
+    const response = await fetch(`/api/flights?budget=${budget*0.7}&from=${from}&to=${to}&date=${date}`);
+    const flights = await response.json();
+    const container = document.getElementById('flights-container');
+    container.innerHTML = '';
+
+    if (!flights || flights.length === 0) {
+      container.innerHTML = `<p class="text-center mt-4">No flights available within your budget 💸</p>`;
+      return;
+    }
+
+    flights.forEach(flight => {
+      const card = document.createElement('div');
+      card.className = 'col-md-4';
+      card.innerHTML = `
+        <div class="card p-3">
+          <h5>${flight.airline}</h5>
+          <p>✈️ ${flight.from} → ${flight.to}</p>
+          <p>🕓 ${flight.departureTime} → ${flight.arrivalTime}</p>
+          <p>💰 ₹${flight.price}</p>
+          <button class="btn btn-success w-100"
+            onclick="confirmFlight('${flight.airline}', '${flight.from}', '${flight.to}', ${flight.price}, ${budget}, '${date}', ${days})">
+            Select Flight
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
     });
+  } catch (err) {
+    console.error(err);
+    alert('Error fetching flights');
+  }
+}
+
+function confirmFlight(airline, from, to, price, budget, date, days) {
+  if (!budget || isNaN(budget)) {
+    alert("⚠️ Budget data missing — please restart the booking flow.");
+    return;
   }
 
-  // When clicking the "To" cell, show modal with possible mock destinations
-  async function onToCellClick(e) {
-    const cell = e.currentTarget;
-    const tr = cell.closest('tr');
-    const currentTo = cell.textContent.trim();
-    // fetch available destinations from server (mock)
-    let destinations = [];
-    try {
-      const res = await fetch('/api/flights/destinations');
-      if (res.ok) destinations = await res.json();
-    } catch (err) {
-      // fallback list
-      destinations = ['DEL','BOM','BLR','MAA','HYD','CCU'];
-    }
+  const travelBudget = budget * 0.7;
+  const hotelBudget = budget * 0.3;
+  const remaining = travelBudget - price + hotelBudget;
 
-    // Show modal and populate list (highlight currentTo)
-    destList.innerHTML = destinations.map(d => `
-      <li data-code="${d}" ${d === currentTo ? 'style="font-weight:700;"' : ''}>${d}</li>
-    `).join('');
-
-    // clicking a destination re-runs the search with that 'to' selected
-    destList.querySelectorAll('li').forEach(li => {
-      li.addEventListener('click', async (ev) => {
-        const code = ev.currentTarget.getAttribute('data-code');
-        destModal.style.display = 'none';
-        // re-run search using lastQuery and selected to
-        await fetchAndRender(code);
-        // scroll to top of results
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    });
-
-    destModal.style.display = 'flex';
-    destModal.setAttribute('aria-hidden', 'false');
+  if (remaining <= 0) {
+    alert("⚠️ This flight exceeds your total travel budget!");
+    return;
   }
 
-  closeModal.addEventListener('click', () => {
-    destModal.style.display = 'none';
-    destModal.setAttribute('aria-hidden', 'true');
-  });
+  alert(`✅ Flight booked successfully!\n✈️ ${airline}\n💰 ₹${price}\n\nRemaining budget for hotel: ₹${remaining.toFixed(2)}`);
 
-  // close modal when clicking outside the box
-  destModal.addEventListener('click', (ev) => {
-    if (ev.target === destModal) {
-      destModal.style.display = 'none';
-      destModal.setAttribute('aria-hidden', 'true');
-    }
-  });
+  // Redirect to hotel booking with valid days
+  window.location.href = `/hotel_selection.html?to=${encodeURIComponent(to)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}`;
+}
 
-  // helper: if user pressed Enter in inputs, run search
-  [dateInput, budgetInput, fromInput].forEach(el => {
-    el.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); fetchAndRender(); }});
-  });
-
-  // initial auto-search if date & budget present
-  if (dateInput.value && budgetInput.value) fetchAndRender();
-
+window.onload = loadFlights;
 </script>
+
 </body>
 </html>
