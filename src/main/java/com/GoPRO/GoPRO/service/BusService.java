@@ -16,7 +16,14 @@ public class BusService {
         new BusDTO("Greenline Travels", "Bangalore", "Chennai", "2025-10-18", 1100.0),
         new BusDTO("SRS Travels", "Bangalore", "Chennai", "2025-10-18", 1250.0),
         new BusDTO("KPN Travels", "Bangalore", "Hyderabad", "2025-10-18", 1350.0),
-        
+        new BusDTO("Rajdhani Travels", "Delhi", "Mumbai", "2025-10-19", 1200.0),
+        new BusDTO("RedLine Express", "Delhi", "Mumbai", "2025-10-19", 1350.0),
+        new BusDTO("InterCity Volvo", "Delhi", "Mumbai", "2025-10-19", 1500.0),
+        new BusDTO("ComfortRide", "Delhi", "Mumbai", "2025-10-19", 1100.0),
+        new BusDTO("BlueSky Travels", "Mumbai", "Delhi", "2025-10-19", 1250.0),
+        new BusDTO("UrbanExpress", "Mumbai", "Delhi", "2025-10-19", 1400.0),
+        new BusDTO("NightLine Volvo", "Mumbai", "Delhi", "2025-10-19", 1550.0),
+        new BusDTO("SuperSaver Bus", "Mumbai", "Delhi", "2025-10-19", 1000.0),
         // --- 2025-10-19 Kerala routes (Kollam, Ernakulam, Trivandrum, etc.) ---
         new BusDTO("Kerala Deluxe 1", "Kollam", "Ernakulam", "2025-10-19", 600.0),
         new BusDTO("Kerala Deluxe 2", "Kollam", "Ernakulam", "2025-10-19", 650.0),

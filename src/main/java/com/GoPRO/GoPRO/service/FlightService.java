@@ -16,10 +16,10 @@ public class FlightService {
     public FlightService() {
         allFlights = new ArrayList<>();
 
-        String[] dates = { "2025-10-16", "2025-10-17", "2025-10-18" };
+        String[] dates = { "2025-10-19", "2025-10-17", "2025-10-18" };
         // use city names now instead of airport codes
         String[][] routes = {
-            { "Mumbai", "Delhi" },
+            { "Mumbai", "Delhi" },{ "Delhi","Mumbai" },
             { "Mumbai", "Bangalore" },
             { "Mumbai", "Chennai" },
             { "Delhi", "Bangalore" },
