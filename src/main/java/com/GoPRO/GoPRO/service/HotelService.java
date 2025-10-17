@@ -16,6 +16,17 @@ public class HotelService {
         // Mock hotel data 💡
         hotels.add(new HotelDTO("Ocean View Resort", "Goa", 4.5, 3500));
         hotels.add(new HotelDTO("Beachside Bliss", "Goa", 4.8, 3800));
+        hotels.add(new HotelDTO("Lakeview Palace", "Bhopal", 4.2, 3000));
+        hotels.add(new HotelDTO("Royal Comfort", "Bhopal", 4.0, 2500));
+        hotels.add(new HotelDTO("Pune Central Inn", "Pune", 4.3, 2800));
+        hotels.add(new HotelDTO("Hilltop Retreat", "Pune", 4.1, 3200));
+        hotels.add(new HotelDTO("City Central Inn", "Bangalore", 4.0, 2000));
+        hotels.add(new HotelDTO("Budget Comforts", "Bangalore", 3.5, 1200));
+        hotels.add(new HotelDTO("Bangalore Grand Stay", "Bangalore", 4.6, 4000));
+        hotels.add(new HotelDTO("Chennai Seaside Hotel", "Chennai", 4.5, 3500));
+        hotels.add(new HotelDTO("Marina View Inn", "Chennai", 4.2, 2700));
+        hotels.add(new HotelDTO("Mysore Heritage Stay", "Mysore", 4.7, 3000));
+        hotels.add(new HotelDTO("Palace View Retreat", "Mysore", 4.4, 2800));
         hotels.add(new HotelDTO("Sunset Sands Hotel", "Goa", 4.2, 3200));
         hotels.add(new HotelDTO("Hilltop Retreat", "Munnar", 4.2, 2700));
         hotels.add(new HotelDTO("Misty Mountains Inn", "Munnar", 4.6, 3000));
@@ -40,6 +51,10 @@ public class HotelService {
         hotels.add(new HotelDTO("Bandra Comfort Stay", "Mumbai", 3.8, 2200));
         hotels.add(new HotelDTO("Colaba Heritage Hotel", "Mumbai", 4.7, 4500));
         hotels.add(new HotelDTO("Juhu Beach Resort", "Mumbai", 4.6, 4000));
+        hotels.add(new HotelDTO("Ernakulam Riverside Hotel", "Ernakulam", 4.3, 2500));
+        hotels.add(new HotelDTO("Cochin Comfort Inn", "Ernakulam", 4.0, 2200));
+        hotels.add(new HotelDTO("Trivandrum Beach Resort", "Trivandrum", 4.6, 3300));
+        hotels.add(new HotelDTO("Capital Stay", "Trivandrum", 4.2, 2800));
 
         // Filter by budget and location
         return hotels.stream()

@@ -28,6 +28,8 @@ public class BusService {
         new BusDTO("Kottayam Comfort", "Kottayam", "Ernakulam", "2025-10-19", 620.0),
         new BusDTO("Calicut Express", "Calicut", "Ernakulam", "2025-10-19", 900.0),
         new BusDTO("Kannur Express", "Kannur", "Ernakulam", "2025-10-19", 1000.0),
+        new BusDTO("Kerala Deluxe 1", "Kollam", "Kannur", "2025-10-19", 600.0),
+        new BusDTO("Kerala Deluxe 2", "Kannur", "Kollam", "2025-10-19", 650.0),
 
         // --- 2025-10-20 Kerala routes (Kollam → Ernakulam etc.) ---
         new BusDTO("Kerala Deluxe 1", "Kollam", "Ernakulam", "2025-10-20", 600.0),
