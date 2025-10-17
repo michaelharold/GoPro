@@ -1,9 +1,10 @@
-com/GoPRO/GoPRO/repository/UserRepository.class
 com/GoPRO/GoPRO/entity/BusDTO.class
 com/GoPRO/GoPRO/controller/TrainController.class
+com/GoPRO/GoPRO/service/UserService.class
 com/GoPRO/GoPRO/GoProApplication.class
+com/GoPRO/GoPRO/service/BudgetService.class
 com/GoPRO/GoPRO/SecurityConfig.class
-com/GoPRO/GoPRO/repository/BudgetRepository.class
+com/GoPRO/GoPRO/service/FirebaseService.class
 com/GoPRO/GoPRO/controller/BudgetController.class
 com/GoPRO/GoPRO/controller/FlightController.class
 com/GoPRO/GoPRO/service/BusService.class
@@ -13,6 +14,7 @@ com/GoPRO/GoPRO/service/TrainService.class
 com/GoPRO/GoPRO/service/FlightService.class
 com/GoPRO/GoPRO/AppConfig.class
 com/GoPRO/GoPRO/controller/BusController.class
+com/GoPRO/GoPRO/config/FirebaseConfig.class
 com/GoPRO/GoPRO/entity/TrainDTO.class
 com/GoPRO/GoPRO/controller/AuthController.class
 com/GoPRO/GoPRO/entity/Budget.class

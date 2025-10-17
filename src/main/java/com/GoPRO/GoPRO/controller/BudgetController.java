@@ -1,9 +1,7 @@
 package com.GoPRO.GoPRO.controller;
 
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,30 +11,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.GoPRO.GoPRO.entity.Budget;
-import com.GoPRO.GoPRO.repository.BudgetRepository;
+import com.GoPRO.GoPRO.service.BudgetService;
 
 @RestController
 @RequestMapping("/api/budget")
 @CrossOrigin(origins = "*")
 public class BudgetController {
 
-    @Autowired
-    private BudgetRepository budgetRepository;
+    private final BudgetService budgetService;
 
-    @PostMapping("/set")
-    public ResponseEntity<Budget> setBudget(@RequestBody Budget budget) {
-        // Compute travel/accommodation budgets
-        budget.setTravelBudget(budget.getTotalBudget() * 0.7);
-        budget.setAccommodationBudget(budget.getTotalBudget() * 0.3);
+    public BudgetController(BudgetService budgetService) {
+        this.budgetService = budgetService;
+    }
 
-        // Save to DB
-        Budget saved = budgetRepository.save(budget);
-
-        return ResponseEntity.ok(saved);
+    @PostMapping("/save")
+    public String saveBudget(@RequestBody Budget budget) throws ExecutionException, InterruptedException {
+        return budgetService.saveBudget(budget);
     }
 
     @GetMapping("/{userId}")
-    public List<Budget> getUserBudgets(@PathVariable Long userId) {
-        return budgetRepository.findByUserId(userId);
+    public Budget getBudget(@PathVariable String userId) throws ExecutionException, InterruptedException {
+        return budgetService.getBudget(userId);
     }
 }

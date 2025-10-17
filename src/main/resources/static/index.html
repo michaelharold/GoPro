@@ -51,31 +51,34 @@
 const form = document.querySelector("form");
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = form.querySelector('input[name="email"]').value;
+    const email = form.querySelector('input[name="email"]').value.trim();
     const password = form.querySelector('input[name="password"]').value;
 
-    const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
+    try {
+        const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
 
-    const msg = await res.text();
+        const msg = await res.text();
 
-    if (res.ok) {
-        // Redirect to next page (create dashboard.html later)
-        window.location.href = "/budget_setting.html";
-    } else {
-        // Show error on the page
-        let errorDiv = document.getElementById("error-message");
-        if (!errorDiv) {
-            errorDiv = document.createElement("div");
-            errorDiv.id = "error-message";
-            errorDiv.style.color = "red";
-            errorDiv.style.marginTop = "10px";
-            form.appendChild(errorDiv);
+        if (res.ok) {
+            window.location.href = "/budget_setting.html";
+        } else {
+            let errorDiv = document.getElementById("error-message");
+            if (!errorDiv) {
+                errorDiv = document.createElement("div");
+                errorDiv.id = "error-message";
+                errorDiv.style.color = "red";
+                errorDiv.style.marginTop = "10px";
+                form.appendChild(errorDiv);
+            }
+            errorDiv.textContent = msg;
         }
-        errorDiv.textContent = msg;
+    } catch (err) {
+        console.error(err);
+        alert("An unexpected error occurred. Please try again.");
     }
 });
 </script>

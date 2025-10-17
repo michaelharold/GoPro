@@ -55,6 +55,7 @@
 
 <script>
 let selectedTransport = null;
+
 const transportButtons = document.querySelectorAll('.btn-option');
 const budgetInput = document.getElementById('budget');
 const daysInput = document.getElementById('days');
@@ -64,23 +65,19 @@ const toInput = document.getElementById('to');
 const destinationFields = document.getElementById('destinationFields');
 const proceedBtn = document.querySelector('.btn-proceed');
 
-// Toggle transport selection and show destination fields
+// Toggle transport selection and show/hide destination fields
 transportButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     transportButtons.forEach(b => b.classList.remove('selected'));
     selectedTransport = btn.getAttribute('data-value');
     btn.classList.add('selected');
 
-    if (['Flight','Bus','Train'].includes(selectedTransport)) {
-      destinationFields.style.display = 'block';
-    } else {
-      destinationFields.style.display = 'none';
-    }
+    destinationFields.style.display = ['Flight','Bus','Train'].includes(selectedTransport) ? 'block' : 'none';
     validateForm();
   });
 });
 
-// Form validation
+// Validate form inputs to enable submit button
 function validateForm() {
   let valid = budgetInput.value && daysInput.value && dateInput.value && selectedTransport;
   if (valid && ['Flight','Bus','Train'].includes(selectedTransport)) {
@@ -89,10 +86,10 @@ function validateForm() {
   proceedBtn.disabled = !valid;
 }
 
-// Input listeners
+// Add input listeners
 [budgetInput, daysInput, dateInput, fromInput, toInput].forEach(el => el.addEventListener('input', validateForm));
 
-// Submit handler
+// Submit form to backend
 document.getElementById('budgetForm').addEventListener('submit', async e => {
   e.preventDefault();
   if (proceedBtn.disabled) return;
@@ -123,16 +120,9 @@ document.getElementById('budgetForm').addEventListener('submit', async e => {
 
     const savedBudget = await response.json();
 
-    // Redirect based on transport
-    if (selectedTransport === 'Flight') {
-      window.location.href = `/flight_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
-    } else if (selectedTransport === 'Bus') {
-      window.location.href = `/bus_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
-    } else if (selectedTransport === 'Train') {
-      window.location.href = `/train_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
-    } else {
-      alert('Unknown transport type selected.');
-    }
+    // Redirect to transport selection page
+    const redirectUrl = `/${selectedTransport.toLowerCase()}_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
+    window.location.href = redirectUrl;
 
   } catch (err) {
     console.error(err);

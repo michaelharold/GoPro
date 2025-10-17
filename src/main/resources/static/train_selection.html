@@ -4,12 +4,20 @@
   <meta charset="UTF-8">
   <title>Train Selection</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .train-item { padding: 10px; border: 1px solid #ccc; margin-bottom: 10px; border-radius: 5px; cursor: pointer; }
+    .train-item.selected { background-color: #d0f0c0; }
+    #proceedBtn { margin-top: 20px; padding: 10px 20px; }
+  </style>
 </head>
 <body>
   <h2>Select Your Train</h2>
-  <div id="trainList"></div>
+  <div id="trainList">Loading...</div>
+  <button id="proceedBtn" disabled>Proceed to Booking</button>
 
 <script>
+let selectedTrain = null;
+
 async function loadTrains() {
   const params = new URLSearchParams(window.location.search);
   const budget = params.get('budget');
@@ -27,20 +35,33 @@ async function loadTrains() {
 
     if (trains.length === 0) {
       trainList.innerHTML = '<p>No trains available within your budget.</p>';
-    } else {
-      trains.forEach(t => {
-        const div = document.createElement('div');
-        div.className = 'train-item';
-        div.innerHTML = `<strong>${t.name}</strong> | ${t.from} → ${t.to} | ₹${t.price} | ${t.date}`;
-        trainList.appendChild(div);
-      });
+      return;
     }
+
+    trains.forEach((t, index) => {
+      const div = document.createElement('div');
+      div.className = 'train-item';
+      div.dataset.index = index;
+      div.innerHTML = `<strong>${t.name}</strong> | ${t.from} → ${t.to} | ₹${t.price} | ${t.date}`;
+      div.addEventListener('click', () => {
+        document.querySelectorAll('.train-item').forEach(item => item.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedTrain = t;
+        document.getElementById('proceedBtn').disabled = false;
+      });
+      trainList.appendChild(div);
+    });
 
   } catch (err) {
     console.error(err);
     alert('Error fetching trains.');
   }
 }
+
+document.getElementById('proceedBtn').addEventListener('click', () => {
+  if (!selectedTrain) return;
+  window.location.href = `/train_booking.html?name=${encodeURIComponent(selectedTrain.name)}&from=${selectedTrain.from}&to=${selectedTrain.to}&date=${selectedTrain.date}&price=${selectedTrain.price}`;
+});
 
 window.onload = loadTrains;
 </script>
