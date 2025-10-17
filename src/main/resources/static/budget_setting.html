@@ -134,7 +134,8 @@ document.getElementById('budgetForm').addEventListener('submit', async e => {
     const savedBudget = await response.json();
 
     // Redirect to transport selection page
-    const redirectUrl = `/${selectedTransport.toLowerCase()}_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}`;
+    const redirectUrl = `/${selectedTransport.toLowerCase()}_selection.html?budget=${savedBudget.travelBudget}&from=${savedBudget.from}&to=${savedBudget.to}&date=${savedBudget.date}&days=${savedBudget.days}`;
+
     window.location.href = redirectUrl;
 
   } catch (err) {

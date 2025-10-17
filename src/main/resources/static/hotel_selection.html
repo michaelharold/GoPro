@@ -7,66 +7,116 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
-    body { background: #f6f9fc; font-family: 'Nunito', sans-serif; padding: 30px; }
-    h2 { text-align: center; margin-bottom: 30px; color: #333; }
+    body { font-family: 'Nunito', sans-serif; background: #f6f9fc; padding: 20px; }
+    h2 { text-align: center; margin-bottom: 20px; color: #333; }
     .card { border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
     .card:hover { transform: scale(1.02); }
-    .btn-primary { background-color: #007bff; border: none; }
-    .btn-primary:hover { background-color: #0069d9; }
+    .btn-primary { background: #007bff; border: none; }
+    .btn-primary:hover { background: #0069d9; }
+    #sidebar { width: 250px; padding: 20px; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    .d-flex { display: flex; gap: 20px; }
   </style>
 </head>
 <body>
 
 <h2>Choose Your Hotel 🏨</h2>
-<div id="hotel-container" class="row g-4"></div>
+
+<div class="d-flex">
+  <div id="hotel-container" class="row g-4 flex-grow-1"></div>
+
+  <div id="sidebar">
+    <h5>Preferences</h5>
+    <label for="budgetSplit">Budget Split (Travel / Hotel): <span id="splitLabel">70% / 30%</span></label>
+    <input type="range" id="budgetSplit" min="0" max="100" value="70" step="5">
+
+    <div class="mb-2 mt-2">
+      <label>From:</label>
+      <input type="text" id="sidebarFrom" class="form-control" value="">
+    </div>
+    <div class="mb-2">
+      <label>To:</label>
+      <input type="text" id="sidebarTo" class="form-control" value="">
+    </div>
+    <div class="mb-2">
+      <label>Days:</label>
+      <input type="number" id="sidebarDays" class="form-control" min="1" value="1">
+    </div>
+
+    <label>Travel Mode:</label>
+    <select id="travelMode" class="form-control mb-2">
+      <option value="flight">Flight</option>
+      <option value="train">Train</option>
+      <option value="bus">Bus</option>
+    </select>
+
+    <button id="savePrefs" class="btn btn-primary w-100 mt-2">Save Changes</button>
+  </div>
+</div>
 
 <script>
+const urlParams = new URLSearchParams(window.location.search);
+let budget = parseFloat(urlParams.get('budget')) || 10000;
+let to = urlParams.get('to') || '';
+let days = parseInt(urlParams.get('days'), 10) || 1;
+let date = urlParams.get('date') || '';
+
+document.getElementById('sidebarTo').value = to;
+document.getElementById('sidebarDays').value = days;
+
+document.getElementById('budgetSplit').addEventListener('input', e => {
+  const travelPct = e.target.value;
+  document.getElementById('splitLabel').textContent = `${travelPct}% / ${100 - travelPct}%`;
+});
+
+document.getElementById('savePrefs').addEventListener('click', () => {
+  const split = parseInt(document.getElementById('budgetSplit').value);
+  const travelBudget = budget * (split / 100);
+  const hotelBudget = budget - travelBudget;
+  const newTo = document.getElementById('sidebarTo').value.trim();
+  const newDays = parseInt(document.getElementById('sidebarDays').value) || 1;
+  const travelMode = document.getElementById('travelMode').value;
+
+  window.location.href = `/${travelMode}_selection.html?budget=${travelBudget}&from=&to=${encodeURIComponent(newTo)}&date=${date}&days=${newDays}&accommodationBudget=${hotelBudget}`;
+});
+
 async function loadHotels() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const budget = parseFloat(urlParams.get('budget'));
-  const to = urlParams.get('to');
-  const days = parseInt(urlParams.get('days'));
-  const date = urlParams.get('date');
-
-  // Mock hotel data 💡
-  const mockHotels = [
-    { name: "Sunrise Resort", location: to, pricePerNight: 2000, rating: 4.2 },
-    { name: "Blue Lagoon Suites", location: to, pricePerNight: 3500, rating: 4.5 },
-    { name: "City Comfort Inn", location: to, pricePerNight: 2500, rating: 4.0 },
-    { name: "Luxury Stay Grand", location: to, pricePerNight: 6000, rating: 4.8 },
-    { name: "Budget Bliss Lodge", location: to, pricePerNight: 1500, rating: 3.9 }
-  ];
-
-  const totalBudget = budget;
-  const filteredHotels = mockHotels.filter(h => h.pricePerNight * days <= totalBudget);
-
   const container = document.getElementById('hotel-container');
-  container.innerHTML = '';
+  container.innerHTML = 'Loading hotels...';
 
-  if (filteredHotels.length === 0) {
-    container.innerHTML = `<p class="text-center mt-4">No hotels available within ₹${totalBudget.toFixed(2)} 😢</p>`;
-    return;
+  try {
+    const response = await fetch(`/api/hotels?location=${encodeURIComponent(to)}&budget=${budget}&days=${days}&date=${encodeURIComponent(date)}`);
+    const hotels = await response.json();
+    container.innerHTML = '';
+
+    if (!hotels || hotels.length === 0) {
+      container.innerHTML = `<p class="text-center mt-4">No hotels available within ₹${budget.toFixed(2)} 😢</p>`;
+      return;
+    }
+
+    hotels.forEach(hotel => {
+      const totalCost = hotel.pricePerNight * days;
+      const card = document.createElement('div');
+      card.className = 'col-md-4';
+      card.innerHTML = `
+        <div class="card p-3">
+          <h5>${hotel.name}</h5>
+          <p>📍 ${hotel.location}</p>
+          <p>⭐ ${hotel.rating} / 5</p>
+          <p>💸 ₹${hotel.pricePerNight}/night</p>
+          <p>🧾 Total (${days} night${days>1?'s':''}): ₹${totalCost}</p>
+          <button class="btn btn-primary w-100" 
+            onclick="bookHotel('${hotel.name}', '${hotel.location}', ${totalCost}, '${date}')">
+            Book Hotel
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+  } catch(err) {
+    console.error(err);
+    container.innerHTML = `<p class="text-center mt-4">Error fetching hotels</p>`;
   }
-
-  filteredHotels.forEach(hotel => {
-    const totalCost = hotel.pricePerNight * days;
-    const card = document.createElement('div');
-    card.className = 'col-md-4';
-    card.innerHTML = `
-      <div class="card p-3">
-        <h5>${hotel.name}</h5>
-        <p>📍 ${hotel.location}</p>
-        <p>⭐ ${hotel.rating} / 5</p>
-        <p>💸 ₹${hotel.pricePerNight}/night</p>
-        <p>🧾 Total (${days} nights): ₹${totalCost}</p>
-        <button class="btn btn-primary w-100" 
-          onclick="bookHotel('${hotel.name}', '${hotel.location}', ${totalCost}, '${date}')">
-          Book Hotel
-        </button>
-      </div>
-    `;
-    container.appendChild(card);
-  });
 }
 
 function bookHotel(name, location, cost, date) {
@@ -76,7 +126,6 @@ function bookHotel(name, location, cost, date) {
 🗓️ ${date}
 💰 Total Cost: ₹${cost}`);
 
-  // Redirect to final confirmation page (or dashboard)
   window.location.href = '/under_progress.html';
 }
 

@@ -7,37 +7,80 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
-    body { font-family: 'Nunito', sans-serif; background: #f5f7fa; padding: 30px; }
-    h2 { text-align: center; margin-bottom: 30px; color: #333; }
+    body { font-family: 'Nunito', sans-serif; background: #f5f7fa; padding: 20px; }
+    h2 { text-align: center; margin-bottom: 20px; color: #333; }
     .card { border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
     .card:hover { transform: scale(1.02); }
     .btn-success { background: #28a745; border: none; }
     .btn-success:hover { background: #218838; }
+    #sidebar { width: 250px; padding: 20px; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    .d-flex { display: flex; gap: 20px; }
   </style>
 </head>
 <body>
 
 <h2>Select Your Bus 🚌</h2>
-<div id="buses-container" class="row g-4"></div>
+
+<div class="d-flex">
+  <div id="buses-container" class="row g-4 flex-grow-1"></div>
+
+  <div id="sidebar">
+    <h5>Preferences</h5>
+    <label for="budgetSplit">Budget Split (Travel / Hotel): <span id="splitLabel">70% / 30%</span></label>
+    <input type="range" id="budgetSplit" min="0" max="100" value="70" step="5">
+    <div class="mb-2 mt-2">
+      <label>From:</label>
+      <input type="text" id="sidebarFrom" class="form-control" value="">
+    </div>
+    <div class="mb-2">
+      <label>To:</label>
+      <input type="text" id="sidebarTo" class="form-control" value="">
+    </div>
+    <label>Travel Mode:</label>
+    <select id="travelMode" class="form-control mb-2">
+      <option value="flight">Flight</option>
+      <option value="train">Train</option>
+      <option value="bus" selected>Bus</option>
+    </select>
+    <button id="savePrefs" class="btn btn-primary w-100 mt-2">Save Changes</button>
+  </div>
+</div>
 
 <script>
-async function loadBuses() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const budget = parseFloat(urlParams.get('budget'));
-  const from = urlParams.get('from');
-  const to = urlParams.get('to');
-  const date = urlParams.get('date');
-  let days = parseInt(urlParams.get('days'), 10);
-  if (isNaN(days) || days <= 0) days = 1;
+const urlParams = new URLSearchParams(window.location.search);
+let budget = parseFloat(urlParams.get('budget')) || 10000;
+let from = urlParams.get('from') || '';
+let to = urlParams.get('to') || '';
+let date = urlParams.get('date') || '';
+let days = parseInt(urlParams.get('days'), 10) || 1;
 
-  const travelBudget = budget * 0.7; // only 70% for travel
+document.getElementById('sidebarFrom').value = from;
+document.getElementById('sidebarTo').value = to;
+
+document.getElementById('budgetSplit').addEventListener('input', e => {
+  const travelPct = e.target.value;
+  document.getElementById('splitLabel').textContent = `${travelPct}% / ${100 - travelPct}%`;
+});
+
+document.getElementById('savePrefs').addEventListener('click', () => {
+  const split = parseInt(document.getElementById('budgetSplit').value);
+  const travelBudget = budget * (split / 100);
+  const hotelBudget = budget - travelBudget;
+  const newFrom = document.getElementById('sidebarFrom').value.trim();
+  const newTo = document.getElementById('sidebarTo').value.trim();
+  const travelMode = document.getElementById('travelMode').value;
+
+  window.location.href = `/${travelMode}_selection.html?budget=${travelBudget}&from=${encodeURIComponent(newFrom)}&to=${encodeURIComponent(newTo)}&date=${date}&days=${days}&accommodationBudget=${hotelBudget}`;
+});
+
+async function loadBuses() {
+  const container = document.getElementById('buses-container');
+  container.innerHTML = 'Loading buses...';
 
   try {
-    const response = await fetch(`/api/buses?from=${from}&to=${to}&date=${date}&budget=${travelBudget}`);
-    if (!response.ok) throw new Error('Failed to fetch buses');
-
+    const travelBudget = budget * (parseInt(document.getElementById('budgetSplit').value)/100);
+    const response = await fetch(`/api/buses?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}&budget=${travelBudget}`);
     const buses = await response.json();
-    const container = document.getElementById('buses-container');
     container.innerHTML = '';
 
     if (!buses || buses.length === 0) {
@@ -54,7 +97,7 @@ async function loadBuses() {
           <p>🚌 ${b.from} → ${b.to}</p>
           <p>💰 ₹${b.price}</p>
           <button class="btn btn-success w-100"
-            onclick="confirmBus('${b.name}', '${b.from}', '${b.to}', ${b.price}, ${budget}, '${date}', ${days})">
+            onclick="confirmBus('${b.name}', '${b.from}', '${b.to}', ${b.price})">
             Select Bus
           </button>
         </div>
@@ -64,18 +107,14 @@ async function loadBuses() {
 
   } catch(err) {
     console.error(err);
-    alert('Error fetching buses');
+    container.innerHTML = `<p class="text-center mt-4">Error fetching buses</p>`;
   }
 }
 
-function confirmBus(name, from, to, price, budget, date, days) {
-  if (!budget || isNaN(budget)) {
-    alert("⚠️ Budget data missing — please restart the booking flow.");
-    return;
-  }
-
-  const travelBudget = budget * 0.7;
-  const hotelBudget = budget * 0.3;
+function confirmBus(name, fromBus, toBus, price) {
+  const travelPct = parseInt(document.getElementById('budgetSplit').value);
+  const travelBudget = budget * (travelPct / 100);
+  const hotelBudget = budget - travelBudget;
   const remaining = travelBudget - price + hotelBudget;
 
   if (remaining <= 0) {
@@ -84,12 +123,10 @@ function confirmBus(name, from, to, price, budget, date, days) {
   }
 
   alert(`✅ Bus booked successfully!\n🚌 ${name}\n💰 ₹${price}\n\nRemaining budget for hotel: ₹${remaining.toFixed(2)}`);
-
-  window.location.href = `/hotel_selection.html?to=${encodeURIComponent(to)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}`;
+  window.location.href = `/hotel_selection.html?to=${encodeURIComponent(toBus)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}`;
 }
 
 window.onload = loadBuses;
 </script>
-
 </body>
 </html>
