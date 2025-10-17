@@ -20,6 +20,11 @@ public class BusController {
     @Autowired
     private BusService busService;
 
+    @GetMapping("/destinations")
+    public List<String> getDestinations() {
+    return busService.getAllCities();
+}
+
     @GetMapping
     public List<BusDTO> getBuses(@RequestParam Double budget,
                                  @RequestParam String from,

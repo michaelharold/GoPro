@@ -14,6 +14,7 @@ import com.GoPRO.GoPRO.service.TrainService;
 
 @RestController
 @RequestMapping("/api/trains")
+
 @CrossOrigin(origins = "*")
 public class TrainController {
 
