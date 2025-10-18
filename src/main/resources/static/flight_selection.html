@@ -3,92 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flight Selection ✈️</title>
+  <title>Flight Selection </title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
-    body { font-family: 'Nunito', sans-serif; background: #f5f7fa; padding: 20px; }
-    h2 { text-align: center; margin-bottom: 20px; color: #333; }
-    .card { border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
-    .card:hover { transform: scale(1.02); }
-    .btn-success { background: #28a745; border: none; }
-    .btn-success:hover { background: #218838; }
-    #sidebar { width: 250px; padding: 20px; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    .d-flex { display: flex; gap: 20px; }
-    /* 🌑 Dark Violet Gradient Background */
-    body {
-      font-family: 'Nunito', sans-serif;
-      background: linear-gradient(to bottom, #0a0a0f 15%, #1a1533 45%, #3b2a84 90%);
-      color: #e8e8e8;
-      min-height: 100vh;
-      padding-top: 80px; /* For navbar spacing */
-    }
-
-    /* 🌌 Animated Subtle Glow Background */
-    .background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, rgba(91,71,199,0.1) 0%, transparent 70%);
-      z-index: 0;
-      pointer-events: none;
-      animation: pulse 8s infinite alternate;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.8; }
-      100% { transform: scale(1.1); opacity: 1; }
-    }
-
-    /* 📝 Navbar Styling */
-    .navbar {
-      background: rgba(15,10,30,0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      z-index: 10;
-    }
-
-    .navbar-brand img {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .navbar-nav .nav-link {
-      color: #e8e8e8;
-      margin-right: 15px;
-      font-weight: 500;
-    }
-    .navbar-nav .nav-link:hover {
-      color: #b6a8ff;
-    }
-
-    /* ✨ Heading */
-    h2 {
+    body { 
+      font-family: 'Nunito', sans-serif; 
+      background: linear-gradient(to bottom, #0a0a0f 15%, #1a1533 45%, #3b2a84 90%); 
+      color: #e8e8e8; min-height: 100vh; 
+      padding-top: 80px; }
+    h2 { 
       text-align: center;
-      margin: 30px 0;
-      color: #e8e8e8;
-      font-weight: 600;
-      z-index: 1;
-      position: relative;
-    }
+       margin: 30px 0;
+        color: #e8e8e8; 
+        font-weight: 600; }
 
-    /* ✈️ Flight Card Styling */
+    /* Flight Card Styling */
     .flight-card {
       background: linear-gradient(145deg, #1e1e2f, #2b2250);
       border-radius: 20px;
-      padding: 25px 30px;
+      padding: 35px 40px;
       color: #e8e8e8;
       box-shadow: 0 0 25px rgba(87, 74, 211, 0.25);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      width: 100%;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .flight-card:hover {
@@ -96,28 +36,41 @@
       box-shadow: 0 0 35px rgba(90, 79, 207, 0.45);
     }
 
-    .flight-info {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 15px;
-    }
-
-    .flight-airline {
+    .flight-name {
       font-size: 22px;
       font-weight: 600;
       color: #b6a8ff;
+      margin-bottom: 12px;
+      text-align: left;
     }
 
-    .flight-details {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    .flight-price {
+    .flight-row {
+      display: flex;
+      justify-content: space-between;
       font-size: 18px;
-      font-weight: 600;
+      font-family: 'Arial', sans-serif;
+      margin-bottom: 15px;
+    }
+
+    .flight-row .flight-destination {
+      text-align: center;
+      flex: 1;
+      font-weight: 900;
+      font-size: 28px;
+    }
+    .flight-row .flight-time {
+      text-align: left;
+      flex: 1;
+      opacity: 0.95;
+      font-weight: 900;
+      font-size: 28px;
+    }
+    .flight-row .flight-price {
+      text-align: right;
+      flex: 1;
       color: #bda9ff;
+      font-weight: 900;
+      font-size: 28px;
     }
 
     .btn-select {
@@ -127,8 +80,10 @@
       padding: 12px 35px;
       font-weight: 600;
       font-size: 15px;
+      width: 40%;
+      margin: 20px auto 0 auto;
+      display: block;
       transition: 0.25s ease;
-      width: 100%;
     }
 
     .btn-select:hover {
@@ -136,57 +91,19 @@
       box-shadow: 0 4px 12px rgba(75,52,170,0.45);
     }
 
-    /* Responsive Layout */
-    @media (max-width: 992px) {
-      .flight-card {
-        padding: 20px;
-      }
-    }
+    #flights-container { display: flex; flex-direction: column; gap: 20px; }
 
     @media (max-width: 768px) {
-      .flight-card {
-        padding: 15px;
-      }
-      .btn-select {
-        padding: 10px 20px;
-      }
-    }
-
-    /* 🌟 Flights Container */
-    #flights-container {
-      position: relative;
-      z-index: 1;
+      .flight-row { flex-direction: column; font-size: 16px; gap: 5px; }
+      .btn-select { width: 70%; padding: 10px 20px; }
     }
 
   </style>
 </head>
 <body>
-
-  <!-- Animated Background -->
-  <div class="background"></div>
-
-  <!-- 🌠 Navbar with Avatar -->
-  <nav class="navbar navbar-expand-lg navbar-dark fixed-top px-4">
-    <a class="navbar-brand d-flex align-items-center" href="#">
-      <img src="your-logo.png" alt="Logo">
-      PlanUp
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Contact Us</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Page Heading -->
   <div class="container" style="padding-top: 30px;">
-    <h2>Select Your Flight ✈️</h2>
-    <div id="flights-container" class="d-flex flex-column gap-4"></div>
+    <h2>Select Your Flight </h2>
+    <div id="flights-container"></div>
   </div>
 
   <script>
@@ -196,9 +113,7 @@
       const from = urlParams.get('from');
       const to = urlParams.get('to');
       const date = urlParams.get('date');
-      let days = parseInt(urlParams.get('days'), 10);
-
-      if (isNaN(days) || days <= 0) days = 1;
+      let days = parseInt(urlParams.get('days'), 10) || 1;
 
       try {
         const response = await fetch(`/api/flights?budget=${budget*0.7}&from=${from}&to=${to}&date=${date}`);
@@ -207,57 +122,48 @@
         container.innerHTML = '';
 
         if (!flights || flights.length === 0) {
-          container.innerHTML = `<p class="text-center mt-4">No flights available within your budget 💸</p>`;
+          container.innerHTML = `<p class="text-center mt-4">No flights available within your budget </p>`;
           return;
         }
 
         flights.forEach(flight => {
           const priceFormatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(flight.price);
-
           const card = document.createElement('div');
           card.className = 'flight-card';
           card.innerHTML = `
-            <div class="flight-info">
-              <div class="flight-airline">${flight.airline}</div>
-              <div class="flight-details">✈️ ${flight.from} → ${flight.to}</div>
-              <div class="flight-details">🕓 ${flight.departureTime} → ${flight.arrivalTime}</div>
-              <div class="flight-price">💰 ${priceFormatted}</div>
+            <div class="flight-name">${flight.airline}</div>
+            <div class="flight-row">
+              <div class="flight-time">${flight.departureTime} → ${flight.arrivalTime}</div>
+              <div class="flight-destination">${flight.from} → ${flight.to}</div>
+              <div class="flight-price">${priceFormatted}</div>
             </div>
-            <button class="btn-select"
-              onclick="confirmFlight('${flight.airline}', '${flight.from}', '${flight.to}', ${flight.price}, ${budget}, '${date}', ${days})">
-              Select Flight
-            </button>
+            <button class="btn-select" onclick="confirmFlight('${flight.airline}', '${flight.from}', '${flight.to}', ${flight.price}, ${budget}, '${date}', ${days})">Available Flight</button>
           `;
           container.appendChild(card);
         });
       } catch (err) {
         console.error(err);
-        alert('❌ Error fetching flights');
+        alert('Error fetching flights');
       }
     }
 
     function confirmFlight(airline, from, to, price, budget, date, days) {
-      if (!budget || isNaN(budget)) {
-        alert("⚠️ Budget data missing — please restart the booking flow.");
-        return;
-      }
-
       const travelBudget = budget * 0.7;
       const hotelBudget = budget * 0.3;
       const remaining = travelBudget - price + hotelBudget;
 
       if (remaining <= 0) {
-        alert("⚠️ This flight exceeds your total travel budget!");
+        alert("This flight exceeds your total travel budget!");
         return;
       }
 
-      alert(`✅ Flight booked successfully!\n✈️ ${airline}\n💰 ₹${price}\n\nRemaining budget for hotel: ₹${remaining.toFixed(2)}`);
-
+      alert(`Flight booked successfully!\n${airline}\n₹${price}\n\nRemaining budget for hotel: ₹${remaining.toFixed(2)}`);
       window.location.href = `/hotel_selection.html?to=${encodeURIComponent(to)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}`;
     }
 
     window.onload = loadFlights;
   </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

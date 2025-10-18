@@ -24,6 +24,11 @@ public class BusService {
         new BusDTO("UrbanExpress", "Mumbai", "Delhi", "2025-10-19", 1400.0),
         new BusDTO("NightLine Volvo", "Mumbai", "Delhi", "2025-10-19", 1550.0),
         new BusDTO("SuperSaver Bus", "Mumbai", "Delhi", "2025-10-19", 1000.0),
+        new BusDTO("Express Mumbai-Delhi 1", "Mumbai", "Delhi", "2025-10-19", 1300.0),
+        new BusDTO("Express Mumbai-Delhi 2", "Mumbai", "Delhi", "2025-10-19", 1450.0),
+        new BusDTO("Luxury Mumbai-Delhi", "Mumbai", "Delhi", "2025-10-19", 1600.0),
+        new BusDTO("Night Rider", "Mumbai", "Delhi", "2025-10-19", 1700.0),
+        new BusDTO("SpeedLine", "Mumbai", "Delhi", "2025-10-19", 1800.0),
         // --- 2025-10-19 Kerala routes (Kollam, Ernakulam, Trivandrum, etc.) ---
         new BusDTO("Kerala Deluxe 1", "Kollam", "Ernakulam", "2025-10-19", 600.0),
         new BusDTO("Kerala Deluxe 2", "Kollam", "Ernakulam", "2025-10-19", 650.0),
