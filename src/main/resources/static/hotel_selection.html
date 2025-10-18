@@ -162,7 +162,14 @@
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-let budget = parseFloat(urlParams.get('budget')) || 10000;
+
+// Read total budget from URL or sessionStorage
+let totalBudget = parseFloat(urlParams.get('totalBudget'));
+if (!totalBudget) totalBudget = parseFloat(sessionStorage.getItem('totalBudget')) || 50000;
+sessionStorage.setItem('totalBudget', totalBudget);
+
+// Hotel & transport info
+let budget = parseFloat(urlParams.get('budget')) || totalBudget;
 let to = urlParams.get('to') || '';
 let days = parseInt(urlParams.get('days'), 10) || 1;
 let date = urlParams.get('date') || '';
@@ -170,72 +177,89 @@ let date = urlParams.get('date') || '';
 document.getElementById('sidebarTo').value = to;
 document.getElementById('sidebarDays').value = days;
 
+// Budget split slider
 document.getElementById('budgetSplit').addEventListener('input', e => {
-  const travelPct = e.target.value;
-  document.getElementById('splitLabel').textContent = `${travelPct}% / ${100 - travelPct}%`;
+    const travelPct = e.target.value;
+    document.getElementById('splitLabel').textContent = `${travelPct}% / ${100 - travelPct}%`;
 });
 
+// Save preferences and redirect to selected travel page
 document.getElementById('savePrefs').addEventListener('click', () => {
-  const split = parseInt(document.getElementById('budgetSplit').value);
-  const travelBudget = budget * (split / 100);
-  const hotelBudget = budget - travelBudget;
-  const newTo = document.getElementById('sidebarTo').value.trim();
-  const newDays = parseInt(document.getElementById('sidebarDays').value) || 1;
-  const travelMode = document.getElementById('travelMode').value;
+    const split = parseInt(document.getElementById('budgetSplit').value);
+    const travelBudget = totalBudget * (split / 100);
+    const hotelBudget = totalBudget - travelBudget;
+    const newTo = document.getElementById('sidebarTo').value.trim();
+    const newDays = parseInt(document.getElementById('sidebarDays').value) || 1;
+    const travelMode = document.getElementById('travelMode').value;
 
-  window.location.href = `/${travelMode}_selection.html?budget=${travelBudget}&from=&to=${encodeURIComponent(newTo)}&date=${date}&days=${newDays}&accommodationBudget=${hotelBudget}`;
+    window.location.href = `/${travelMode}_selection.html?budget=${travelBudget}&from=&to=${encodeURIComponent(newTo)}&date=${date}&days=${newDays}&accommodationBudget=${hotelBudget}&totalBudget=${totalBudget}`;
 });
 
+// Load hotels from API
 async function loadHotels() {
-  const container = document.getElementById('hotel-container');
-  container.innerHTML = 'Loading hotels...';
+    const container = document.getElementById('hotel-container');
+    container.innerHTML = 'Loading hotels...';
 
-  try {
-    const response = await fetch(`/api/hotels?location=${encodeURIComponent(to)}&budget=${budget}&days=${days}&date=${encodeURIComponent(date)}`);
-    const hotels = await response.json();
-    container.innerHTML = '';
+    try {
+        const response = await fetch(`/api/hotels?location=${encodeURIComponent(to)}&budget=${budget}&days=${days}&date=${encodeURIComponent(date)}`);
+        const hotels = await response.json();
+        container.innerHTML = '';
 
-    if (!hotels || hotels.length === 0) {
-      container.innerHTML = `<p class="text-center mt-4">No hotels available within ₹${budget.toFixed(2)} 😢</p>`;
-      return;
+        if (!hotels || hotels.length === 0) {
+            container.innerHTML = `<p class="text-center mt-4">No hotels available within ₹${budget.toFixed(2)} 😢</p>`;
+            return;
+        }
+
+        hotels.forEach(hotel => {
+            const totalCost = hotel.pricePerNight * days;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.padding = '20px';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:flex-end; font-size:1.3rem; font-weight:700; margin-bottom:5px;">
+                    Rating: ${hotel.rating}/5
+                </div>
+                <div class="hotel-name">${hotel.name}</div>
+                <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:700; margin-top:10px;">
+                    <div>Price per Night: ₹${hotel.pricePerNight}</div>
+                    <div>Total (${days} night${days>1?'s':''}): ₹${totalCost}</div>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" 
+                    onclick="bookHotel('${hotel.name}', '${hotel.location}', ${totalCost}, '${date}')">
+                    Book Hotel
+                </button>
+            `;
+            container.appendChild(card);
+        });
+    } catch(err) {
+        console.error(err);
+        container.innerHTML = `<p class="text-center mt-4">Error fetching hotels</p>`;
     }
-
-    hotels.forEach(hotel => {
-      const totalCost = hotel.pricePerNight * days;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.padding = '20px';
-      card.innerHTML = `
-        <div style="display:flex; justify-content:flex-end; font-size:1.3rem; font-weight:700; margin-bottom:5px;">
-          Rating: ${hotel.rating}/5
-        </div>
-        <div class="hotel-name">${hotel.name}</div>
-        <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:700; margin-top:10px;">
-          <div>Price per Night: ₹${hotel.pricePerNight}</div>
-          <div>Total (${days} night${days>1?'s':''}): ₹${totalCost}</div>
-        </div>
-        <button class="btn btn-primary w-100 mt-3" 
-          onclick="bookHotel('${hotel.name}', '${hotel.location}', ${totalCost}, '${date}')">
-          Book Hotel
-        </button>
-      `;
-      container.appendChild(card);
-    });
-
-  } catch(err) {
-    console.error(err);
-    container.innerHTML = `<p class="text-center mt-4">Error fetching hotels</p>`;
-  }
 }
 
 function bookHotel(name, location, cost, date) {
-  alert(`✅ Hotel booked successfully!
-🏨 ${name}
-📍 ${location}
-🗓️ ${date}
-💰 Total Cost: ₹${cost}`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const transportName = urlParams.get('transportName') || 'N/A';
+    const transportFrom = urlParams.get('from') || 'N/A';
+    const transportTo = urlParams.get('to') || 'N/A';
+    const transportPrice = parseFloat(urlParams.get('transportPrice')) || 0;
+    const transportType = urlParams.get('transportType') || 'N/A';
+    const totalBudget = parseFloat(urlParams.get('totalBudget')) || transportPrice + cost;
+    const days = parseInt(urlParams.get('days'), 10) || 1;
 
-  window.location.href = '/under_progress.html';
+    const redirectUrl = `/booking_confirmation.html?` +
+                        `transport=${encodeURIComponent(transportType)}` +
+                        `&transportName=${encodeURIComponent(transportName)}` +
+                        `&from=${encodeURIComponent(transportFrom)}` +
+                        `&to=${encodeURIComponent(transportTo)}` +
+                        `&transportPrice=${transportPrice}` +
+                        `&hotelName=${encodeURIComponent(name)}` +
+                        `&hotelLocation=${encodeURIComponent(location)}` +
+                        `&hotelCost=${cost}` +
+                        `&totalBudget=${totalBudget}` +
+                        `&days=${days}`;
+
+    window.location.href = redirectUrl;
 }
 
 window.onload = loadHotels;

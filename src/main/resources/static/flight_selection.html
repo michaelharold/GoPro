@@ -166,7 +166,8 @@
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-let budget = parseFloat(urlParams.get('budget')) || 10000;
+const totalBudget = parseFloat(urlParams.get('totalBudget')) || 10000; 
+let budget = parseFloat(urlParams.get('budget')) || totalBudget;
 let from = urlParams.get('from') || '';
 let to = urlParams.get('to') || '';
 let date = urlParams.get('date') || '';
@@ -182,8 +183,8 @@ document.getElementById('budgetSplit').addEventListener('input', e => {
 
 document.getElementById('savePrefs').addEventListener('click', () => {
   const split = parseInt(document.getElementById('budgetSplit').value);
-  const travelBudget = budget * (split / 100);
-  const hotelBudget = budget - travelBudget;
+  const travelBudget = totalBudget * (split / 100);
+  const hotelBudget = totalBudget - travelBudget;
   const newFrom = document.getElementById('sidebarFrom').value.trim();
   const newTo = document.getElementById('sidebarTo').value.trim();
   const travelMode = document.getElementById('travelMode').value;
@@ -238,7 +239,10 @@ function confirmFlight(airline, fromFlight, toFlight, price) {
   }
 
   alert(`Flight booked successfully!\n${airline}\n₹${price}\nRemaining budget for hotel: ₹${remaining.toFixed(2)}`);
-  window.location.href = `/hotel_selection.html?to=${encodeURIComponent(toFlight)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}`;
+  window.location.href = `/hotel_selection.html?to=${encodeURIComponent(to)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}` +
+                        `&transportType=flight&transportName=${encodeURIComponent(airline)}&transportPrice=${price}&from=${encodeURIComponent(from)}`;
+
+
 }
 
 window.onload = loadFlights;

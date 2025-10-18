@@ -163,11 +163,27 @@
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-let budget = parseFloat(urlParams.get('budget')) || 10000;
+// Try URL first
+let totalBudget = parseFloat(urlParams.get('totalBudget'));
+
+// If not in URL, check sessionStorage
+if (!totalBudget) {
+  totalBudget = parseFloat(sessionStorage.getItem('totalBudget')) || 50000;
+}
+
+// Always save the total budget in sessionStorage for next pages
+sessionStorage.setItem('totalBudget', totalBudget);
+
+let budget = parseFloat(urlParams.get('budget')) || totalBudget;
 let from = urlParams.get('from') || '';
 let to = urlParams.get('to') || '';
 let date = urlParams.get('date') || '';
 let days = parseInt(urlParams.get('days'), 10) || 1;
+
+const transportType = urlParams.get('transportType') || '';
+const transportName = urlParams.get('transportName') || '';
+const transportFrom = urlParams.get('from') || '';
+const transportPrice = parseFloat(urlParams.get('transportPrice')) || 0;
 
 document.getElementById('sidebarFrom').value = from;
 document.getElementById('sidebarTo').value = to;
@@ -179,8 +195,8 @@ document.getElementById('budgetSplit').addEventListener('input', e => {
 
 document.getElementById('savePrefs').addEventListener('click', () => {
   const split = parseInt(document.getElementById('budgetSplit').value);
-  const travelBudget = budget * (split / 100);
-  const hotelBudget = budget - travelBudget;
+  const travelBudget = totalBudget * (split / 100);
+  const hotelBudget = totalBudget - travelBudget;
   const newFrom = document.getElementById('sidebarFrom').value.trim();
   const newTo = document.getElementById('sidebarTo').value.trim();
   const travelMode = document.getElementById('travelMode').value;
@@ -234,7 +250,9 @@ function confirmBus(name, fromBus, toBus, price) {
   }
 
   alert(`Bus booked successfully!\n${name}\n₹${price}\nRemaining budget for hotel: ₹${remaining.toFixed(2)}`);
-  window.location.href = `/hotel_selection.html?to=${encodeURIComponent(toBus)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}`;
+ window.location.href = `/hotel_selection.html?to=${encodeURIComponent(to)}&days=${days}&date=${date}&budget=${remaining.toFixed(2)}` +
+                        `&transportType=bus&transportName=${encodeURIComponent(name)}&transportPrice=${price}&from=${encodeURIComponent(from)}`;
+
 }
 
 window.onload = loadBuses;
